@@ -109,10 +109,18 @@
 				// 添加音视频节点
 				var video = result.data;
 				boxEl.appendChild(video);
+				video.playsInline = true;
+				video.x5PlaysInline = true;
+				video.webkitPlaysInline = true;
+				video.play()
 			} else if (type === 'removed') {
 				// 删除对应音视频节点
 				var video = result.data;
 				boxEl.removeChild(video);
+				video.playsInline = true;
+				video.x5PlaysInline = true;
+				video.webkitPlaysInline = true;
+				video.play()
 			} else if (type == 'leave') {
 				// 音视频结束, 清空所有音视频 UI
 			}
