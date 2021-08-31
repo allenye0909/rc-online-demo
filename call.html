@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Document</title>
+</head>
+<!-- IMLib SDK -->
+<script src="https://cdn.ronghub.com/RongIMLib-4.4.4.prod.js"></script>
+<!-- RTCLib v5 -->
+<script src="https://cdn.ronghub.com/RCRTC-5.1.7.prod.js"></script>
+<!-- RCRTCAdapter -->
+<script src="https://cdn.ronghub.com/RCRTCAdapter-1.0.7.prod.js"></script>
+<!-- CallLib SDK -->
+<script src="https://cdn.ronghub.com/RongCallLib.3.2.1.min.js"></script>
+<!-- VUE -->
+<!-- <script src="https://unpkg.com/vue/dist/vue.js"></script> -->
+
+<script src="https://unpkg.com/vconsole/dist/vconsole.min.js"></script>
+<script>
+	// VConsole will be exported to `window.VConsole` by default.
+	new window.VConsole();
+</script>
+
+
+<body>
+	<p>
+		<span>appkey：</span><input id="appkey" type="text" value="" placeholder="请输入 appkey" autocomplete="off">
+		<span>token：</span><input id="token" type="text" value="" placeholder="请输入 token" autocomplete="off">
+		<span>userId：</span><input id="userId" type="text" disabled value="">
+		<span>targetId：</span><input id="targetId" type="text" value="">
+		<br>
+		<input type="button" value="连接" onclick="connect()">
+		<input type="button" value="拨打" onclick="handelCall()">
+		<input type="button" value="接听" onclick="handelAccept()">
+		<input type="button" value="挂断" onclick="handelHungup()">
+		<input type="button" value="userAgent" onclick="alert(navigator.userAgent)">
+
+
+	</p>
+	<div id="box"></div>
+	<script>
+		const allen = {
+			appkey: "vnroth0kvahzo",
+			token: "37GlFWd0MztWEhQb6ixrS6ynOhNw/ADqVIl7FZ6ScJQ=@5q2p.cn.rongnav.com;5q2p.cn.rongcfg.com",
+			userId: "allen",
+			targetId: "jack",
+		}
+		const jack = {
+			appkey: "vnroth0kvahzo",
+			token: "/j/O3Utm340sd7VauWc8lPTPm2EGLmNf0ZMlrsMyRyo=@5q2p.cn.rongnav.com;5q2p.cn.rongcfg.com",
+			userId: "jack",
+			targetId: "allen",
+		}
+		let appkey = token = userId = targetId = null;
+		let rongCallLib, _message;
+		function connect() {
+			checkValue();
+			const im = RongIMLib.init({ appkey })
+			// 添加事件监听器
+			im.watch({
+				// 连接状态监听
+				status(evt) {
+					console.log('连接状态码:', evt.status);
+				},
+				// 消息监听
+				message(evt) {
+					console.log('收到新消息:', evt.message);
+				}
+			})
+
+			// RCRTC 是 RTCLib v5 的顶级变量定义
+			const rtcClient = im.install(RCRTC.installer)
+
+			// RongCallLib 为 CallLib v3 的顶级变量定义
+			im.install(RongCallLib.installer)
+
+
+			var config = {
+				timeout: 20000,
+				RongIMLib: RongIMLib,
+				RongRTC: rtcClient,
+				RongRTCAdapter: RCRTCAdapter
+			};
+			rongCallLib = RongCallLib.init(config);
+
+
+
+			//token 可从开发者后台获取 或 Server API
+			im.connect({ token }).then(user => {
+				console.log('链接成功, 链接用户 id 为: ', user.id);
+				document.getElementById('userId').value = user.id
+			}).catch(error => {
+				console.log('链接失败: ', error.code, error.msg);
+			});
+
+
+			var videoWatcher = function (result) {
+				var type = result.type;
+				var boxEl = document.getElementById('box');
+				if (type === 'added') {
+					// 添加音视频节点
+					var video = result.data;
+					boxEl.appendChild(video);
+					video.playsInline = true;
+					video.x5PlaysInline = true;
+					video.webkitPlaysInline = true;
+					// video.play()
+				} else if (type === 'removed') {
+					// 删除对应音视频节点
+					var video = result.data;
+					boxEl.removeChild(video);
+					video.playsInline = true;
+					video.x5PlaysInline = true;
+					video.webkitPlaysInline = true;
+					// video.play()
+				} else if (type == 'leave') {
+					// 音视频结束, 清空所有音视频 UI
+				}
+			};
+			rongCallLib.videoWatch(videoWatcher);
+
+
+
+			var commandWatcher = function (message) {
+				_message = message
+				// 根据消息类型做对应处理
+				var messageType = message.messageType;
+				console.log(messageType, message)
+			};
+			rongCallLib.commandWatch(commandWatcher);
+		}
+
+
+		function handelCall() {
+			var params = {
+				conversationType: RongIMLib.CONVERSATION_TYPE.PRIVATE,
+				targetId: targetId,
+				inviteUserIds: [targetId],
+				mediaType: RongCallLib.VoIPMediaType.MEDIA_VEDIO
+			};
+			rongCallLib.call(params, function (error) {
+				if (error) {
+					console.error('发起通话失败', error);
+				}
+			});
+			console.log("发起通话成功！")
+		}
+
+
+		function handelAccept() {
+			// params 中的 message 来自 rongCallLib.commandWatch 监听中收到的 InviteMessage。
+			var params = {
+				conversationType: _message.conversationType,
+				targetId: _message.targetId,
+				mediaType: RongCallLib.VoIPMediaType.MEDIA_VEDIO
+			};
+			rongCallLib.accept(params, function (error) {
+				if (error) {
+					console.error('接听通话失败', error);
+				}
+				console.log("接听成功")
+			});
+		}
+
+		function handelHungup() {
+			var params = {
+				conversationType: RongIMLib.CONVERSATION_TYPE.PRIVATE,
+				targetId: targetId
+			};
+			rongCallLib.hungup(params, function (error) {
+				if (error) {
+					console.error('挂断通话失败', error);
+				}
+				console.log("挂断成功！")
+			});
+		}
+
+		function checkValue() {
+
+			function getValue(id) {
+				return document.getElementById(id).value
+			}
+			function setValue(id, value) {
+				document.getElementById(id).value = value
+			}
+
+			if (location.search.includes("allen")) {
+				appkey = getValue("appkey") || allen.appkey
+				token = getValue("token") || allen.token
+				userId = getValue("userId")
+				targetId = getValue("targetId") || allen.targetId
+
+				setValue("appkey", appkey)
+				setValue("token", token)
+				setValue("targetId", targetId)
+			} else if (location.search.includes("jack")) {
+				appkey = appkey = getValue("appkey") || jack.appkey
+				token = appkey = getValue("token") || jack.token
+				userId = appkey = getValue("userId")
+				targetId = appkey = getValue("targetId") || jack.targetId
+
+				setValue("appkey", appkey)
+				setValue("token", token)
+				setValue("targetId", targetId)
+			} else {
+				appkey = getValue("appkey")
+				token = getValue("token")
+				targetId = getValue("targetId")
+			}
+			console.log(appkey, token, userId, targetId)
+		}
+	</script>
+</body>
+
+</html>
