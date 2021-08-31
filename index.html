@@ -39,11 +39,9 @@
 
 
 	</p>
-	<div id="box">
-		<video></video>
-
-	</div>
+	<div id="box"></div>
 	<script>
+		alert(navigator.userAgent);
 		const allen = {
 			appkey: "vnroth0kvahzo",
 			token: "37GlFWd0MztWEhQb6ixrS6ynOhNw/ADqVIl7FZ6ScJQ=@5q2p.cn.rongnav.com;5q2p.cn.rongcfg.com",
@@ -59,29 +57,7 @@
 		let appkey = token = userId = targetId = null;
 		let rongCallLib, _message;
 		function connect() {
-			if (location.search.includes("allen")) {
-				appkey = document.getElementById('appkey').value || allen.appkey
-				token = document.getElementById('token').value || allen.token
-				userId = document.getElementById('userId').value
-				targetId = document.getElementById('targetId').value || allen.targetId
-
-				document.getElementById('appkey').value = appkey
-				document.getElementById('token').value = token
-				document.getElementById('targetId').value = targetId
-			} else if (location.search.includes("jack")) {
-				appkey = document.getElementById('appkey').value || jack.appkey
-				token = document.getElementById('token').value || jack.token
-				userId = document.getElementById('userId').value
-				targetId = document.getElementById('targetId').value || jack.targetId
-
-				document.getElementById('appkey').value = appkey
-				document.getElementById('token').value = token
-				document.getElementById('targetId').value = targetId
-			} else {
-				appkey = document.getElementById('appkey').value
-				token = document.getElementById('token').value
-				targetId = document.getElementById('targetId').value
-			}
+			checkValue();
 			const im = RongIMLib.init({ appkey })
 			// 添加事件监听器
 			im.watch({
@@ -202,6 +178,40 @@
 			});
 		}
 
+		function checkValue() {
+
+			function getValue(id) {
+				return document.getElementById(id).value
+			}
+			function setValue(id, value) {
+				document.getElementById(id).value = value
+			}
+
+			if (location.search.includes("allen")) {
+				appkey = getValue("appkey") || allen.appkey
+				token = getValue("token") || allen.token
+				userId = getValue("userId")
+				targetId = getValue("targetId") || allen.targetId
+
+				setValue("appkey", appkey)
+				setValue("token", token)
+				setValue("targetId", targetId)
+			} else if (location.search.includes("jack")) {
+				appkey = appkey = getValue("appkey") || jack.appkey
+				token = appkey = getValue("token") || jack.token
+				userId = appkey = getValue("userId")
+				targetId = appkey = getValue("targetId") || jack.targetId
+
+				setValue("appkey", appkey)
+				setValue("token", token)
+				setValue("targetId", targetId)
+			} else {
+				appkey = getValue("appkey")
+				token = getValue("token")
+				targetId = getValue("targetId")
+			}
+			console.log(appkey, token, userId, targetId)
+		}
 	</script>
 </body>
 
