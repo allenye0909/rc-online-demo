@@ -19,6 +19,7 @@
 <!-- <script src="https://unpkg.com/vue/dist/vue.js"></script> -->
 
 <script src="https://unpkg.com/vconsole/dist/vconsole.min.js"></script>
+<script src="./utils.js"></script>
 <script>
 	// VConsole will be exported to `window.VConsole` by default.
 	new window.VConsole();
@@ -64,6 +65,7 @@
 				// 连接状态监听
 				status(evt) {
 					console.log('连接状态码:', evt.status);
+					toast(`连接状态码--->${evt.status}`)
 				},
 				// 消息监听
 				message(evt) {
@@ -92,7 +94,9 @@
 			im.connect({ token }).then(user => {
 				console.log('链接成功, 链接用户 id 为: ', user.id);
 				document.getElementById('userId').value = user.id
+				toast(`链接成功,id: ${user.id}`)
 			}).catch(error => {
+				toast(`链接失败: ${error.code}`)
 				console.log('链接失败: ', error.code, error.msg);
 			});
 
@@ -129,6 +133,7 @@
 				// 根据消息类型做对应处理
 				var messageType = message.messageType;
 				console.log(messageType, message)
+				toast(messageType)
 			};
 			rongCallLib.commandWatch(commandWatcher);
 		}
@@ -144,9 +149,12 @@
 			rongCallLib.call(params, function (error) {
 				if (error) {
 					console.error('发起通话失败', error);
+					toast("发起通话失败")
+				} else {
+					console.log("发起通话成功！")
+					toast("发起通话成功！")
 				}
 			});
-			console.log("发起通话成功！")
 		}
 
 
@@ -160,8 +168,11 @@
 			rongCallLib.accept(params, function (error) {
 				if (error) {
 					console.error('接听通话失败', error);
+					toast("接听通话失败")
+				} else {
+					toast("接听成功")
+					console.log("接听成功")
 				}
-				console.log("接听成功")
 			});
 		}
 
@@ -173,8 +184,11 @@
 			rongCallLib.hungup(params, function (error) {
 				if (error) {
 					console.error('挂断通话失败', error);
+					toast("挂断通话失败")
+				} else {
+					toast("挂断成功！")
+					console.log("挂断成功！")
 				}
-				console.log("挂断成功！")
 			});
 		}
 
@@ -213,6 +227,9 @@
 				targetId = getValue("targetId")
 			}
 			console.log(appkey, token, userId, targetId)
+		}
+		function toast(msg, time = 1000) {
+			Utils.toast(msg, time)
 		}
 	</script>
 </body>
