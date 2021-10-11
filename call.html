@@ -11,6 +11,7 @@
 <script src="https://cdn.ronghub.com/RongIMLib-4.4.4.prod.js"></script>
 <!-- RTCLib v5 -->
 <!-- 5.1.8 修复在 IOS 上不能播放视频问题 -->
+<!-- <script src="https://cdn.ronghub.com/RCRTC-5.1.0.prod.js"></script> -->
 <script src="https://cdn.ronghub.com/RCRTC-5.1.8.prod.js"></script>
 <!-- RCRTCAdapter -->
 <script src="https://cdn.ronghub.com/RCRTCAdapter-1.0.7.prod.js"></script>
@@ -60,6 +61,9 @@
 		let rongCallLib, _message;
 		checkValue();
 		function connect() {
+			if (!location.search.includes("allen") && !location.search.includes("jack")) {
+				checkValue();
+			}
 			const im = RongIMLib.init({ appkey })
 			// 添加事件监听器
 			im.watch({
@@ -76,6 +80,9 @@
 
 			// RCRTC 是 RTCLib v5 的顶级变量定义
 			const rtcClient = im.install(RCRTC.installer)
+			// const rtcClient = im.install(RCRTC.installer, {
+			// 	sdpSemantics: 'plan-b'
+			// })
 
 			// RongCallLib 为 CallLib v3 的顶级变量定义
 			im.install(RongCallLib.installer)
@@ -142,7 +149,8 @@
 
 		function handelCall() {
 			var params = {
-				conversationType: RongIMLib.CONVERSATION_TYPE.PRIVATE,
+				// conversationType: RongIMLib.CONVERSATION_TYPE.PRIVATE,
+				conversationType: 3,
 				targetId: targetId,
 				inviteUserIds: [targetId],
 				mediaType: RongCallLib.VoIPMediaType.MEDIA_VEDIO
