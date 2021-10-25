@@ -24,7 +24,9 @@
 <script src="./utils.js"></script>
 <script>
 	// VConsole will be exported to `window.VConsole` by default.
-	new window.VConsole();
+	if ((navigator.userAgent.match(/(iPhone|iPod|Android|ios|iOS|iPad|Backerry|WebOS|Symbian|Windows Phone|Phone)/i))) {
+		new window.VConsole();
+	}
 </script>
 
 
@@ -149,12 +151,12 @@
 
 		function handelCall() {
 			var params = {
-				// conversationType: RongIMLib.CONVERSATION_TYPE.PRIVATE,
-				conversationType: 3,
+				conversationType: RongIMLib.CONVERSATION_TYPE.PRIVATE,
 				targetId: targetId,
 				inviteUserIds: [targetId],
 				mediaType: RongCallLib.VoIPMediaType.MEDIA_VEDIO
 			};
+			console.log(params)
 			rongCallLib.call(params, function (error) {
 				if (error) {
 					console.error('发起通话失败', error);

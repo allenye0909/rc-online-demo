@@ -21,6 +21,8 @@ const initRTCClient = (e) => {
 		logLevel: window.RCEngine.LogLevel.DEBUG
 	});
 
+  console.log(rtcClient)
+
   e.nextElementSibling.style.color = '#09f';
 };
 

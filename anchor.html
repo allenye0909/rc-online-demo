@@ -36,7 +36,9 @@
   <script src="https://unpkg.com/vconsole/dist/vconsole.min.js"></script>
   <script>
     // VConsole will be exported to `window.VConsole` by default.
-    new window.VConsole();
+    if ((navigator.userAgent.match(/(iPhone|iPod|Android|ios|iOS|iPad|Backerry|WebOS|Symbian|Windows Phone|Phone)/i))) {
+      new window.VConsole();
+    }
   </script>
   <script src="./config.js"></script>
 </head>
@@ -108,7 +110,7 @@
         <span class="arrow horizontal-arrow left-horizontal-arrow">------------------------</span>
         <span class="arrow vertical-short-arrow">------------------------------------------------------</span>
         <span class="arrow horizontal-arrow right-revert-horizontal-arrow">
-          <------------------------</span>
+          <------------------------< /span>
             <div class="tips">离开房间后，可重新加入房间继续后续流程</div>
       </div>
       <div class="liveurl-wrap">
