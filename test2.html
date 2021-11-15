@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <!-- <script src="https://cdn.ronghub.com/RongIMLib-4.5.0.prod.js"></script>
+
+    <script src="https://cdn.ronghub.com/RCRTC-5.2.0.prod.js"></script>
+
+    <script src="https://cdn.ronghub.com/RCRTCAdapter-1.0.8.prod.js"></script>
+
+    <script src="https://cdn.ronghub.com/RongCallLib.3.2.3.min.js"></script> -->
+</head>
+
+<body>
+    <div id="box"></div>
+
+    <script>
+
+
+        const list = ["https://cdn.ronghub.com/RongIMLib-4.5.0.prod.js", "https://cdn.ronghub.com/RCRTC-5.2.0.prod.js", "https://cdn.ronghub.com/RCRTCAdapter-1.0.8.prod.js", "https://cdn.ronghub.com/RongCallLib.3.2.3.min.js"]
+
+        function loadScript(src, callback) {
+            if (!src) return src;
+            var script = document.createElement("script");
+            script.onload = function () {
+                if (!!callback) callback();
+            };
+
+            script.src = src;
+            document.head.appendChild(script);
+
+        }
+
+        loadScript(list[0], function () {
+            console.log("SDK 加载完成")
+            loadScript(list[1], function () {
+                console.log("SDK 加载完成")
+                loadScript(list[2], function () {
+                    console.log("SDK 加载完成")
+                    loadScript(list[3], function () {
+                        console.log("SDK 加载完成")
+                        init()
+                    });
+                });
+            });
+        });
+
+
+        function init() {
+            const token = "/j/O3Utm340sd7VauWc8lPTPm2EGLmNf0ZMlrsMyRyo=@5q2p.cn.rongnav.com;5q2p.cn.rongcfg.com";
+            const appkey = "vnroth0kvahzo"
+            // IMLib v4 初始化
+            const im = RongIMLib.init({ appkey })
+
+            im.watch({
+                // 连接状态监听
+                status(evt) {
+                    console.log('连接状态码:', evt.status);
+                },
+                // 消息监听
+                message(evt) {
+                    console.log('收到新消息:', evt.message);
+                }
+            })
+
+            // RTCLib v5 初始化，RCRTC 为 RTCLib v5 的顶级变量定义，params 详情请查看 RTCLib v5 集成文档
+            const rtcClient = im.install(RCRTC.installer)
+
+            // CallLib 插件安装，RongCallLib 为 CallLib v3 的顶级变量定义
+            im.install(RongCallLib.installer)
+
+            // CallLib 初始化
+            var config = {
+                // 呼叫超时时间
+                timeout: 20000,
+                // RongIMLib 
+                RongIMLib: RongIMLib,
+                // RTCLib v5 初始化后获取到的实例，如示例代码中的 rtcClient
+                RongRTC: rtcClient,
+                // RCRTCAdapter 为 RCRTCAdapter 的顶级变量定义
+                RongRTCAdapter: RCRTCAdapter
+            };
+            rongCallLib = RongCallLib.init(config);
+
+
+            var commandWatcher = function (message) {
+                var messageType = message.messageType;
+                // 根据消息类型做对应处理
+            };
+            rongCallLib.commandWatch(commandWatcher);
+
+            var videoWatcher = function (result) {
+                var type = result.type;
+                var boxEl = document.getElementById('box');
+                if (type === 'added') {
+                    // 添加音视频节点
+                    var video = result.data;
+                    boxEl.appendChild(video);
+                } else if (type === 'removed') {
+                    // 删除对应音视频节点
+                    // var video = result.data;
+                    // boxEl.removeChild(video);
+                } else if (type == 'leave') {
+                    // 音视频结束, 清空所有音视频 UI
+                }
+            };
+            rongCallLib.videoWatch(videoWatcher);
+
+            im.connect({ token }).then(user => {
+                console.log('链接成功, 链接用户 id 为: ', user.id);
+                call()
+            }).catch(error => {
+                console.log('链接失败: ', error.code, error.msg);
+            });
+
+        }
+
+        function call() {
+            var params = {
+                conversationType: RongIMLib.CONVERSATION_TYPE.PRIVATE,
+                targetId: 'allen',
+                inviteUserIds: ['allen'],
+				mediaType: RongCallLib.VoIPMediaType.MEDIA_VEDIO
+
+            };
+            console.log("执行 call 了")
+            rongCallLib.call(params, function (error) {
+                if (error) {
+                    console.error('发起通话失败', error);
+                }
+            });
+        }
+
+
+    </script>
+</body>
+
+</html>

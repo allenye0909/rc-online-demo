@@ -113,6 +113,7 @@
 
 			var videoWatcher = function (result) {
 				var type = result.type;
+				console.log("videoWatch type", type)
 				var boxEl = document.getElementById('box');
 				if (type === 'added') {
 					// 添加音视频节点
