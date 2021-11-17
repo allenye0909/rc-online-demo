@@ -156,7 +156,10 @@
 				conversationType: RongIMLib.CONVERSATION_TYPE.PRIVATE,
 				targetId: targetId,
 				inviteUserIds: [targetId],
-				mediaType: RongCallLib.VoIPMediaType.MEDIA_VEDIO
+				mediaType: RongCallLib.VoIPMediaType.MEDIA_VEDIO,
+				extra: {
+					name: "扩展字段"
+				}
 			};
 			console.log(params)
 			rongCallLib.call(params, function (error) {
