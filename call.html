@@ -41,6 +41,8 @@
 		<input type="button" value="拨打" onclick="handelCall()">
 		<input type="button" value="接听" onclick="handelAccept()">
 		<input type="button" value="挂断" onclick="handelHungup()">
+		<input type="button" value="mute" onclick="mute()">
+		<input type="button" value="unmute" onclick="unmute()">
 		<input type="button" value="userAgent" onclick="alert(navigator.userAgent)">
 
 
@@ -206,6 +208,14 @@
 					console.log("挂断成功！")
 				}
 			});
+		}
+
+		function mute() {
+			rongCallLib.mute();
+		}
+
+		function unmute() {
+			rongCallLib.unmute();
 		}
 
 		function checkValue() {
