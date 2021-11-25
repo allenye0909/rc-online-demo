@@ -174,7 +174,17 @@ const publishMicrophoneCamera = async (e) => {
   }
 
   // 获取摄像头、麦克风资源
-  const { code, tracks } = await rtcClient.createMicrophoneAndCameraTracks();
+  const { code, tracks } = await rtcClient.createMicrophoneAndCameraTracks(
+    "tag",
+    {
+      video: {
+        // 默认帧率为 15
+        frameRate: RCRTC.RCFrameRate.FPS_15,
+        // 默认分辨率为 640 * 480
+        resolution: RCRTC.RCResolution.W1920_H1080
+      }
+    }
+  );
   if (code !== RCRTC.RCRTCCode.SUCCESS) {
     alert(`获取资源失败: ${code}`);
     return;
@@ -197,7 +207,16 @@ const publishScreenShare = async (e) => {
   }
 
   // 获取屏幕共享资源
-  const { code, track } = await rtcClient.createScreenVideoTrack();
+  const { code, track } = await rtcClient.createScreenVideoTrack(
+    "tag",
+    {
+      // 默认帧率为 15
+      frameRate: RCRTC.RCFrameRate.FPS_15,
+      // 默认分辨率为 640 * 480
+      resolution: RCRTC.RCResolution.W1920_H1080
+    }
+  );
+  console.log("获取屏幕共享track", track)
   if (code !== RCRTC.RCRTCCode.SUCCESS) {
     alert(`获取资源失败: ${code}`);
     return;
