@@ -59,7 +59,7 @@ const registerPeerReportListener = () => {
 		},
     // 音视频质量数据监听
 		onStateReport(reports) {
-			console.log(`质量数据: `, reports);
+			// console.log(`质量数据: `, reports);
 		}
 	});
 };
@@ -183,10 +183,12 @@ const publishMicrophoneCamera = async (e) => {
       }
     }
   );
+  // const { code, tracks } = await rtcClient.createMicrophoneAndCameraTracks();
   if (code !== RCRTC.RCRTCCode.SUCCESS) {
     alert(`获取资源失败: ${code}`);
     return;
   }
+  window._tracks = tracks;
 
   // 发布
 	const pubRes = await publish(tracks);
@@ -218,6 +220,12 @@ const publishScreenShare = async (e) => {
     alert(`获取资源失败: ${code}`);
     return;
   }
+
+  track.on(RCRTC.RCLocalTrack.EVENT_LOCAL_TRACK_END, (t) => {
+    // 取消发布屏幕共享流，room 为当前加入的房间实例
+    // room.unpublish([ track ])
+    console.log("取消发布屏幕共享流监听", t)
+  })
 
   // 发布
 	const pubRes = await publish([track]);
