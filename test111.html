@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.ronghub.com/RongIMLib-4.4.7.prod.js"></script>
+    <title>Document</title>
+</head>
+
+<body>
+    <button onclick="connect(true)">allen</button>
+    <button onclick="connect(false)">jack</button>
+    <button onclick="disconnect()">disconnect</button>
+    <button onclick="get()">get</button>
+    <script src="https://unpkg.com/vconsole/dist/vconsole.min.js"></script>
+    <script>
+        // VConsole will be exported to `window.VConsole` by default.
+        if ((navigator.userAgent.match(/(iPhone|iPod|Android|ios|iOS|iPad|Backerry|WebOS|Symbian|Windows Phone|Phone)/i))) {
+            new window.VConsole();
+        }
+    </script>
+    <script>
+
+        // 应用初始化以获取 RongIMLib 实例对象，请务必保证此过程只被执行一次,连接类型推荐使用comet
+        const im = RongIMLib.init({ appkey: 'vnroth0kvahzo', logLevel: 0 });
+        im.watch({
+            // 监听消息通知
+            message(event) {
+                // 新接收到的消息内容
+                const message = event.message;
+                console.log(message)
+            },
+        }
+        )
+        function connect(params) {
+            disconnect()
+            console.log(params)
+            if (params) {
+                im.connect({ token: "37GlFWd0MztWEhQb6ixrS6ynOhNw/ADqVIl7FZ6ScJQ=@5q2p.cn.rongnav.com;5q2p.cn.rongcfg.com" }).then(user => {
+                    console.log('链接成功, 链接用户 id 为: ', user.id);
+                    get()
+                }).catch(error => {
+                    console.log('链接失败: ', error.code, error.msg);
+                });
+            } else {
+                im.connect({ token: '/j/O3Utm340sd7VauWc8lPTPm2EGLmNf0ZMlrsMyRyo=@5q2p.cn.rongnav.com;5q2p.cn.rongcfg.com' }).then(user => {
+                    console.log('链接成功, 链接用户 id 为: ', user.id);
+                    get()
+                }).catch(error => {
+                    console.log('链接失败: ', error.code, error.msg);
+                });
+            }
+        }
+
+        function get() {
+            const conversationTypes = [RongIMLib.CONVERSATION_TYPE.GROUP]
+            im.Conversation.getTotalUnreadCount(true, [1, 3]).then(function (totalUnreadCount) {
+                console.log('获取未读总数成功', totalUnreadCount);
+            });
+
+            im.Conversation.getList({
+                count: 30,
+                startTime: 0,
+                order: 0
+            }).then(conversationList => {
+                console.log('获取会话列表成功', conversationList);
+            });
+        }
+
+        function disconnect() {
+            im.disconnect().then(() => console.log('断开链接成功'));
+        }
+    </script>
+</body>
+
+</html>
