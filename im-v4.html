@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="./config.js"></script>
+    <script src="https://cdn.ronghub.com/RongIMLib-4.4.7.prod.js"></script>
+</head>
+
+<body>
+    <script>
+        // const appkey = "8brlm7uf8ozt3"
+        // const token = "2v8tmW2mQLXfViA2C6p0Jm1hC0xv/+xhxFY4yoL9rhg=@vyzw.cn.rongnav.com;vyzw.cn.rongcfg.com"
+
+        const { appkey, token } = Config
+
+
+        // 应用初始化以获取 RongIMLib 实例对象，请务必保证此过程只被执行一次,连接类型推荐使用comet
+        const im = RongIMLib.init({ appkey });
+
+        // 添加事件监听
+        im.watch({
+            // 监听会话列表变更事件
+            conversation(event) {
+                // 假定存在 getExistedConversationList 方法，以获取当前已存在的会话列表数据
+                const conversationList = [];
+                // 发生变更的会话列表
+                const updatedConversationList = event.updatedConversationList;
+                // 通过 im.Conversation.merge 计算最新的会话列表
+                const latestConversationList = im.Conversation.merge({ conversationList, updatedConversationList })
+            },
+            // 监听消息通知
+            message(event) {
+                // 新接收到的消息内容
+                const message = event.message;
+            },
+            // 监听 IM 连接状态变化
+            status(event) {
+                console.log('connection status:', event.status);
+            },
+            // 监听聊天室 KV 数据变更
+            chatroom(event) {
+                /**
+                 * 聊天室 KV 存储数据更新
+                 * @example
+                 * [
+                 *  {
+                 *    "key": "name",
+                 *    "value": "我是小融融",
+                 *    "timestamp": 1597591258338, 
+                 *    "chatroomId": "z002", 
+                 *    "type": 1 // 1: 更新（ 含:修改和新增 ）、2: 删除
+                 *  },
+                 * ]
+                 */
+                const updatedEntries = event.updatedEntries
+            },
+            expansion(event) {
+                /**
+                 * 更新的消息拓展数据
+                 * @example {
+                 *    expansion: { key: 'value' },      // 设置或更新的扩展值
+                 *    messageUId: 'URIT-URIT-ODMF-DURR' // 设置或更新扩展的消息 uid
+                 * }
+                 */
+                const updatedExpansion = event.updatedExpansion;
+                /**
+                 * 删除的消息拓展数据
+                 * @example {
+                 *    deletedKeys: ['key1', 'key2'],    // 设置或更新的扩展值
+                 *    messageUId: 'URIT-URIT-ODMF-DURR' // 设置或更新扩展的消息 uid
+                 * }
+                 */
+                const deletedExpansion = event.deletedExpansion;
+            }
+        });
+
+        im.connect({ token }).then(user => {
+            console.log('链接成功, 链接用户 id 为: ', user.id);
+        }).catch(error => {
+            console.log('链接失败: ', error.code, error.msg);
+        });
+    </script>
+</body>
+
+</html>

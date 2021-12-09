@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="./config.js"></script>
+    <script src="https://cdn.ronghub.com/RongIMLib-5.0.0.prod.js"></script>
+</head>
+
+<body>
+    <p>
+    <p>文件上传后，可以在全局获取 file</p>
+    <input type="file" name="" id="file" onchange="handelChange(event)">
+    </p>
+    <script>
+        // const appkey = "8brlm7uf8ozt3"
+        // const token = "2v8tmW2mQLXfViA2C6p0Jm1hC0xv/+xhxFY4yoL9rhg=@vyzw.cn.rongnav.com;vyzw.cn.rongcfg.com"
+        const { appkey, token } = Config
+        // 应用初始化以获取 RongIMLib 实例对象，请务必保证此过程只被执行一次,连接类型推荐使用comet
+        RongIMLib.init({ appkey });
+
+        // 添加事件监听
+
+        const Events = RongIMLib.Events
+        RongIMLib.addEventListener(Events.CONNECTING, function () {
+            console.log("正在链接服务器");
+        });
+
+        RongIMLib.addEventListener(Events.CONNECTED, function () {
+            console.log("已经链接到服务器");
+        });
+
+        RongIMLib.addEventListener(Events.MESSAGES, function (messages) {
+            console.log("消息监听：", messages);
+        });
+
+        /**
+         * 手动调用 disconnect 方法或者用户被踢下线 会触发这个事件
+         */
+        RongIMLib.addEventListener(Events.DISCONNECT, () => {
+            console.log("连接中断，需要业务层进行重连处理");
+        });
+
+        /**
+         * 链接出问题时，内部进行重新链接，会出发这个事件
+         */
+        RongIMLib.addEventListener(Events.SUSPEND, () => {
+            console.log("链接中断，SDK 会尝试重连，业务层无需关心");
+        });
+        // 设置输入状态事件监听
+        RongIMLib.addEventListener(Events.TYPING_STATUS, (event) => {
+            console.log("设置输入状态事件监听", event.status);
+        });
+
+        RongIMLib.addEventListener(Events.CHATROOM, (event) => {
+            console.warn("chatroom", event);
+        });
+
+        RongIMLib.addEventListener(Events.CONVERSATION, (event) => {
+            console.log("会话监听：", event);
+        });
+
+
+        RongIMLib.connect(token).then((res) => {
+            if (res.code === 0) {
+                console.log("userId:", res.data.userId)
+            }
+        })
+
+
+        function handelChange(params) {
+            console.log(params)
+            window.file = params.target.files[0];
+        }
+
+    </script>
+</body>
+
+</html>

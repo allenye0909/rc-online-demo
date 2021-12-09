@@ -18,7 +18,7 @@ const initIM = (e) => {
   imClient = RongIMLib.init({
     appkey,
     navigators: Config.navi ? [Config.navi] : undefined,
-    logLevel: 1
+    logLevel: 0
   });
   
   e.nextElementSibling.style.color = '#09f';
