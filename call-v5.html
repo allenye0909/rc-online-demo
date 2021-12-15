@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://cdn.ronghub.com/RongIMLib-5.0.1.prod.js"></script>
+    <script src="https://cdn.ronghub.com/RCRTC-5.2.latest.js"></script>
+    <script src="https://cdn.ronghub.com/RCCall-5.0.latest.js"></script>
+</head>
+
+<body>
+    <span>appkey：</span><input id="appkey" type="text" value="" placeholder="请输入 appkey" autocomplete="off">
+    <span>token：</span><input id="token" type="text" value="" placeholder="请输入 token" autocomplete="off">
+    <span>userId：</span><input id="userId" type="text" disabled value="">
+    <span>targetId：</span><input id="targetId" type="text" value="">
+    <hr>
+
+    <button onclick="handelConnect()">connect</button>
+    <button onclick="handelCall()">call</button>
+    <button onclick="handelAccept()">accept</button>
+    <button onclick="handelHungup()">hungup</button>
+
+    
+    <div id="box"></div>
+
+    <script>
+        // console.log(RongIMLib, RCRTC, RCCall) // 顶级变量
+
+        const allen = {
+            appkey: "vnroth0kvahzo",
+            token: "37GlFWd0MztWEhQb6ixrS6ynOhNw/ADqVIl7FZ6ScJQ=@5q2p.cn.rongnav.com;5q2p.cn.rongcfg.com",
+            userId: "allen",
+            targetId: "jack",
+        }
+        const jack = {
+            appkey: "vnroth0kvahzo",
+            token: "/j/O3Utm340sd7VauWc8lPTPm2EGLmNf0ZMlrsMyRyo=@5q2p.cn.rongnav.com;5q2p.cn.rongcfg.com",
+            userId: "jack",
+            targetId: "allen",
+        }
+        
+        const isAllenJack = location.search.includes("allen") || location.search.includes("jack");
+
+
+        // RTCLib
+        const { installer: rtcInstaller, RCRTCClient, RCTrack, RCFrameRate, RCResolution } = RCRTC
+
+        // CallLib
+        const { installer: callInstaller, RCCallClient, RCCallSession, RCCallErrorCode, IDeviceChangeParams, ISessionListener, IEndSummary, ISenderInfo, IMuteUser, IInvitedUsers, RCCallLanguage, RCCallEndReason, RCCallMediaType, IOfflineRecord, RCCallSessionState } = RCCall
+        var mediaType = 2, appkey, token, userId, targetId, rtcClient, caller, _session;
+
+        isAllenJack && handelConnect(); // 链接
+
+        function handelConnect() {
+            checkValue();
+            // IM 客户端初始化
+            RongIMLib.init({
+                appkey: allen.appkey,
+            });
+
+            // RTC 客户端初始化
+            rtcClient = RongIMLib.installPlugin(rtcInstaller)
+
+            // CallLib 客户端初始化
+            caller = RongIMLib.installPlugin(callInstaller, {
+
+                // rtcClient 实例 （必填）
+                rtcClient,
+                /**
+                 * 被动收到邀请 （收到一个远端发起的新会话）, 会产生一个新的 session 对象 （必填）
+                 */
+                onSession(session) {
+                    _session = session
+                    /** 
+                     * **收到新的 session 后需要立即注册事件监听**
+                     */
+                    session.registerSessionListener({
+
+                        /**
+                         * 当远端用户已开始响铃，表示对方已收到呼叫请求
+                         * @param sender 已响铃的用户
+                         * @param session 当前的 session 对象
+                         */
+                        onRinging(sender, session) {
+                            const { userId } = sender;
+                        },
+
+                        /**
+                         * 当远端用户同意接听
+                         * @param sender 远端用户
+                         * @param session 当前的 session 对象
+                         */
+                        onAccept(sender, session) {
+                            const { userId } = sender;
+                        },
+
+                        /**
+                         * 当有远端用户挂断
+                         * @param sender 远端用户
+                         * @param reason 挂断的原因
+                         * @param session 当前的 session 对象
+                         */
+                        onHungup(sender, reason, session) {
+                            const { userId } = sender;
+                        },
+
+                        /**
+                         * 本端资源或远端资源已获取，track为本地音频或音视频, track不可设置成 Vue 组件的响应式数据
+                         * @param track 本端资源或远端资源
+                         * @param session 当前的 session 对象
+                         */
+                        onTrackReady(track, session) {
+                            playVideo(track)
+                        },
+                    });
+                },
+
+                /**
+                 *  以下三条只要满足一条，就会触发onSessionClose
+                 *  1、本端用户自己主动挂断
+                 *  2、服务端把本端用户踢出 RTC 房间
+                 *  3、房间里小于2个人
+                 *
+                 *  @param {RCCallSession} session 被结束的 session 对象
+                 *  @param summaryInfo 结束一个 session 的后汇总信息
+                 */
+                onSessionClose(session, summaryInfo) {
+
+                },
+            });
+
+            console.log(allen.token)
+            RongIMLib.connect(allen.token)
+                .then((user) => {
+                    console.log("链接成功, 链接用户 id 为: ", user.data.userId);
+                    document.getElementById('userId').value = user.data.userId
+                })
+                .catch((error) => {
+                    console.log("链接失败: ", error.code, error.msg);
+                });
+        }
+
+        const handelCall = async () => {
+            /**
+             * 发起单人通话，如果成功后会产生一个新的session
+             * @param targetId 被呼叫一方的用户 id   必填
+             * @param mediaType 1->音频呼叫 or 2->音视频呼叫  必填
+             * @param listener session对象上注册的事件 （必填）
+             * @param constraints 获取音频或音视频资源时的参数 可选
+             * @param params.channelId 组织 Id 可选
+             */
+            const { code, session } = await caller.call({
+                targetId: targetId,
+                mediaType,
+                listener: {
+
+                    /**
+                     * 当远端用户已开始响铃，表示对方已收到呼叫请求 （必填）
+                     * @param sender 已响铃的用户
+                     * @param session 当前的 session 对象
+                     */
+                    onRinging(sender, session) {
+                        const { userId } = sender;
+                    },
+
+                    /**
+                     * 当远端用户同意接听 （必填）
+                     * @param sender 远端用户
+                     * @param session 当前的 session 对象
+                     */
+                    onAccept(sender, session) {
+                        const { userId } = sender;
+                    },
+
+                    /**
+                     * 当有远端用户挂断 （必填）
+                     * @param sender 远端用户
+                     * @param reason 挂断的原因
+                     * @param session 当前的 session 对象
+                     */
+                    onHungup(sender, reason, session) {
+                        const { userId } = sender;
+                    },
+
+                    /**
+                     * 本端资源或远端资源已获取，track为本地音频或音视频, track不可设置成 Vue 组件的响应式数据 （必填）
+                     * @param track 本端资源或远端资源
+                     * @param session 当前的 session 对象
+                     */
+                    onTrackReady(track, session) {
+                        playVideo(track)
+                    },
+                },
+            });
+
+            if (code === RCCallErrorCode.SUCCESS) {
+                // do something
+            }
+        }
+        const handelAccept = async () => {
+            const { code } = await _session.accept();
+            if (code === RCCallErrorCode.SUCCESS) {
+                // do something
+            }
+        }
+        const handelHungup = async () => {
+            const { code } = await _session.hungup();
+            if (code === RCCallErrorCode.SUCCESS) {
+                // do something
+                removeVideoEl()
+            }
+
+        }
+        function checkValue() {
+            function getValue(id) {
+                return document.getElementById(id).value
+            }
+            function setValue(id, value) {
+                document.getElementById(id).value = value
+            }
+
+            if (location.search.includes("allen")) {
+                appkey = getValue("appkey") || allen.appkey
+                token = getValue("token") || allen.token
+                userId = getValue("userId")
+                targetId = getValue("targetId") || allen.targetId
+
+                setValue("appkey", appkey)
+                setValue("token", token)
+                setValue("targetId", targetId)
+            } else if (location.search.includes("jack")) {
+                appkey = getValue("appkey") || jack.appkey
+                token = getValue("token") || jack.token
+                userId = getValue("userId")
+                targetId = getValue("targetId") || jack.targetId
+
+                setValue("appkey", appkey)
+                setValue("token", token)
+                setValue("targetId", targetId)
+            } else {
+                appkey = getValue("appkey")
+                token = getValue("token")
+                targetId = getValue("targetId")
+            }
+            console.log(appkey, token, userId, targetId)
+        }
+        function playVideo(track) {
+            console.log(track)
+            // track.isLocalTrack() 是否为本地资源
+            // track.isAudioTrack() 是否为音频
+            // track.isVideoTrack() 是否为视频
+            // track.getUserId()    产生该 track 的用户id
+
+            // 远程的音频直接播放, 为了减少回音，可不播放本端音频
+            if (track.isAudioTrack()) {
+                track.play();
+            }
+
+            // 视频在对应的容器里播放
+            if (track.isVideoTrack()) {
+                const box = document.getElementById("box");
+                const video = document.createElement("video");
+                video.classList.add("video-" + track.getUserId());
+                box.appendChild(video);
+                track.play(video);
+            }
+        }
+        /**
+         * 离开房间后，清除所有 video 标签
+         */
+        const removeVideoEl = () => {
+            const videoWrapEl = document.getElementById('box');
+            videoWrapEl.innerHTML = '';
+        };
+    </script>
+</body>
+
+</html>
