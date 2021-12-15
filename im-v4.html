@@ -19,7 +19,7 @@
 
 
         // 应用初始化以获取 RongIMLib 实例对象，请务必保证此过程只被执行一次,连接类型推荐使用comet
-        const im = RongIMLib.init({ appkey });
+        const im = RongIMLib.init({ appkey, logLevel: 0 });
 
         // 添加事件监听
         im.watch({

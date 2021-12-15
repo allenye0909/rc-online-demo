@@ -61,13 +61,12 @@
 			userId: "jack",
 			targetId: "allen",
 		}
+		const isAllenJack = location.search.includes("allen") || location.search.includes("jack");
 		let appkey = token = userId = targetId = null;
 		let rongCallLib, _message;
-		checkValue();
+		isAllenJack && connect();
 		function connect() {
-			if (!location.search.includes("allen") && !location.search.includes("jack")) {
-				checkValue();
-			}
+			checkValue()
 			const im = RongIMLib.init({ appkey })
 			// 添加事件监听器
 			im.watch({
@@ -145,7 +144,7 @@
 				_message = message
 				// 根据消息类型做对应处理
 				var messageType = message.messageType;
-				console.log(messageType, message)
+				log("commandWatch->", messageType, "->",  message)
 				toast(messageType)
 			};
 			rongCallLib.commandWatch(commandWatcher);
@@ -153,7 +152,7 @@
 
 
 		function handelCall() {
-			checkValue()
+			// checkValue()
 			var params = {
 				conversationType: RongIMLib.CONVERSATION_TYPE.PRIVATE,
 				targetId: targetId,
@@ -236,7 +235,6 @@
 				setValue("appkey", appkey)
 				setValue("token", token)
 				setValue("targetId", targetId)
-				connect()
 			} else if (location.search.includes("jack")) {
 				appkey = getValue("appkey") || jack.appkey
 				token = getValue("token") || jack.token
@@ -246,7 +244,6 @@
 				setValue("appkey", appkey)
 				setValue("token", token)
 				setValue("targetId", targetId)
-				connect()
 			} else {
 				appkey = getValue("appkey")
 				token = getValue("token")
@@ -256,6 +253,10 @@
 		}
 		function toast(msg, time = 1000) {
 			Utils.toast(msg, time)
+		}
+
+		var log = (tag, ...args) => {
+			console.log(tag, new Date().toISOString(), ...args)
 		}
 	</script>
 </body>
