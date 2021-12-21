@@ -20,7 +20,7 @@
 
         // 应用初始化以获取 RongIMLib 实例对象，请务必保证此过程只被执行一次,连接类型推荐使用comet
 
-        RongIMLib.RongIMClient.init(appkey, '', {logLevel: 0}); //开发者后台 -> 基本信息 获取
+        RongIMLib.RongIMClient.init(appkey, '', { logLevel: 0 }); //开发者后台 -> 基本信息 获取
 
 
         /* 连接状态监听器 */
@@ -36,6 +36,14 @@
                 console.log(message);
             }
         });
+
+        var params = {
+            //status 标识当前监听到的会话状态
+            onChanged: function (status) {
+                console.log(status);
+            }
+        };
+        RongIMClient.setConversationStatusListener(params);
 
 
         /* 开发者后台获取或 Server API */

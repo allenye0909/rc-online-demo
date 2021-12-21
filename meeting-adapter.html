@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://cdn.ronghub.com/RongIMLib-4.5.3.prod.js"></script>
+
+    <script src="https://cdn.ronghub.com/RCRTC-5.2.2.prod.js"></script>
+
+    <script src="https://cdn.ronghub.com/RCRTCAdapter-1.0.9.prod.js"></script>
+</head>
+
+<body>
+    <!-- <button onclick="handelConnect()">handelConnect</button>
+    <button onclick="RCRTCAdapterInit()">RCRTCAdapterInit</button> -->
+
+    <button onclick="handelJoin()">handelJoin</button>
+    <button onclick="handelPublish(0)">handelPublish0</button>
+    <button onclick="handelPublish(1)">handelPublish1</button>
+    <button onclick="handelPublish(2)">handelPublish2</button>
+
+
+    <script>
+        const allen = {
+            appkey: "vnroth0kvahzo",
+            token: "37GlFWd0MztWEhQb6ixrS6ynOhNw/ADqVIl7FZ6ScJQ=@5q2p.cn.rongnav.com;5q2p.cn.rongcfg.com",
+            userId: "allen",
+            targetId: "jack",
+        }
+        const jack = {
+            appkey: "vnroth0kvahzo",
+            token: "/j/O3Utm340sd7VauWc8lPTPm2EGLmNf0ZMlrsMyRyo=@5q2p.cn.rongnav.com;5q2p.cn.rongcfg.com",
+            userId: "jack",
+            targetId: "allen",
+        }
+        // let user = {
+        //     appkey: "m7ua80gbmo56m",
+        //     token: "t+nff66ZZd4LFnQYU6nYL4WH1mkMjbzkng915U0MVlk=@1kre.cn.rongnav.com;1kre.cn.rongcfg.com",
+        //     userId: "jack",
+        //     targetId: "allen",
+        // }
+
+        user = location.search.includes("allen") ? allen : jack;
+        const { Room, Stream, Message, Device, Storage, StreamType } = RCRTCAdapter
+
+
+        let publish_user = []
+        let room;
+        let stream;
+        // appKey 可在融云开发者后台获取
+        const im = RongIMLib.init({ appkey: user.appkey, logLevel: 0 })
+        // 添加事件监听器
+        im.watch({
+            // 连接状态监听
+            status(evt) {
+                console.log('连接状态码:', evt.status);
+            },
+            // 消息监听
+            message(evt) {
+                console.log('收到新消息:', evt.message);
+            }
+        })
+
+        // RCRTC 是 RTCLib v5 的顶级变量定义
+        const rtcClient = im.install(RCRTC.installer)
+
+
+        function handelConnect() {
+            RCRTCAdapterInit()
+            //token 可从开发者后台获取 或 Server API
+            im.connect({ token: user.token }).then(user => {
+                console.log('链接成功, 链接用户 id 为: ', user.id);
+            }).catch(error => {
+                console.log('链接失败: ', error.code, error.msg);
+            });
+        }
+
+        handelConnect()
+
+        function RCRTCAdapterInit() {
+            RCRTCAdapter.init({
+                client: rtcClient,
+                // mode: RCRTCAdapter.Mode.RTC,
+                // liveRole: RCRTCAdapter.ROLE.ANCHOR
+            })
+
+            room = new Room({
+                // 音视频房间 ID
+                id: 'roomId', // 设置房间 ID  为 roomId
+                joined(user) {
+                    // user.id 加入房间
+                },
+                left(user) {
+                    // user.id 离开房间
+                },
+                kick(msg) {
+                    // 当前登录 user 被踢出房间
+                }
+            });
+
+            stream = new Stream({
+                // 成员已发布资源，此时可按需订阅 
+                published(user) {
+                    publish_user.push(user);
+                    console.log("published user:", user);
+                    stream.subscribe(user).then((user) => {
+                        const { id, stream: { tag, mediaStream } } = user;
+                        // 订阅成功后会获取到对方媒体流，将媒体流添加到页面上的 video 节点即可展示对方音视频画面
+                        const node = document.createElement('video');
+                        node.autoplay = true;
+                        node.srcObject = mediaStream;
+                        node.id = id;
+                        document.body.appendChild(node);
+                    });
+                },
+                // 成员已取消发布资源，此时需关闭流 
+                unpublished(user) {
+                    // 当对方成员取消订阅后，会自动触发此函数，此时己方取消订阅对方音视频流，然后做页面移除对方 video 节点即可
+                    stream.unsubscribe(user).then(() => {
+                        const node = document.getElementById(user.id);
+                        node.remove();
+                    });
+                }
+            });
+        }
+
+
+
+
+
+        function handelJoin() {
+            room.join().then(() => {
+                console.log('join successfully');
+            }, error => {
+                console.log(error);
+            });
+        }
+
+        // function handelSubscribe() {
+        //     stream.subscribe(user).then((user) => {
+        //         let { id, stream: { tag, mediaStream } } = user;
+        //         // 订阅成功后会获取到对方媒体流，将媒体流添加到页面上的 video 节点即可展示对方音视频画面
+        //     });
+        // }
+
+
+        function handelPublish(type) {
+            console.log(type, "handelPublish")
+            stream.get().then(({ mediaStream }) => {
+                stream.publish({
+                    stream: {
+                        tag: type + '-11',
+                        // AUDIO: 0
+                        // AUDIO_AND_VIDEO: 2
+                        // NODE: -1
+                        // VIDEO: 1
+                        type: type, // StreamType.AUDIO_AND_VIDEO,
+                        mediaStream
+                    }
+                }).then(() => {
+                    console.log('发布成功');
+                }, error => {
+                    console.log(error);
+                });
+            }, error => {
+                console.error(error);
+            });
+        }
+
+        function handelLevel() {
+            room.leave().then(() => {
+                console.log('leave successfully');
+            }, error => {
+                console.log(error);
+            });
+        }
+
+
+    </script>
+</body>
+
+</html>

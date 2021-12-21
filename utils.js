@@ -17,7 +17,12 @@ var Utils = (function (exports) {
         }, duration);
     }
 
+    const log = (tag, ...args) => {
+        console.log(tag, new Date().toISOString(), ...args)
+    }
+
     exports.toast = toast;
+    exports.log = log;
 
     Object.defineProperty(exports, '__esModule', { value: true });
 
