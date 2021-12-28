@@ -12,6 +12,7 @@
 </head>
 
 <body>
+    <p>type:1 为音频呼叫；2 为 音视频呼叫</p>
     <span>appkey：</span><input id="appkey" type="text" value="" placeholder="请输入 appkey" autocomplete="off">
     <span>token：</span><input id="token" type="text" value="" placeholder="请输入 token" autocomplete="off">
     <span>userId：</span><input id="userId" type="text" disabled value="">
@@ -23,7 +24,7 @@
     <button onclick="handelAccept()">accept</button>
     <button onclick="handelHungup()">hungup</button>
 
-    
+
     <div id="box"></div>
 
     <script>
@@ -41,7 +42,7 @@
             userId: "jack",
             targetId: "allen",
         }
-        
+
         const isAllenJack = location.search.includes("allen") || location.search.includes("jack");
 
 
@@ -50,7 +51,8 @@
 
         // CallLib
         const { installer: callInstaller, RCCallClient, RCCallSession, RCCallErrorCode, IDeviceChangeParams, ISessionListener, IEndSummary, ISenderInfo, IMuteUser, IInvitedUsers, RCCallLanguage, RCCallEndReason, RCCallMediaType, IOfflineRecord, RCCallSessionState } = RCCall
-        var mediaType = 2, appkey, token, userId, targetId, rtcClient, caller, _session;
+        var appkey, token, userId, targetId, rtcClient, caller, _session;
+        const mediaType = Utils.getQueryVariable("type") == 1 ? 1 : 2
 
         isAllenJack && handelConnect(); // 链接
 

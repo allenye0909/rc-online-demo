@@ -32,6 +32,7 @@
 
 <body>
 	<p>
+		<p>type:1 为音频呼叫；2 为 音视频呼叫</p>
 		<span>appkey：</span><input id="appkey" type="text" value="" placeholder="请输入 appkey" autocomplete="off">
 		<span>token：</span><input id="token" type="text" value="" placeholder="请输入 token" autocomplete="off">
 		<span>userId：</span><input id="userId" type="text" disabled value="">
@@ -64,6 +65,7 @@
 		const isAllenJack = location.search.includes("allen") || location.search.includes("jack");
 		let appkey = token = userId = targetId = null;
 		let rongCallLib, _message;
+		const mediaType = Utils.getQueryVariable("type") == 1 ? RongCallLib.VoIPMediaType.MEDIA_AUDIO : RongCallLib.VoIPMediaType.MEDIA_VEDIO
 		isAllenJack && handelConnect();
 		function handelConnect() {
 			checkValue()
@@ -147,7 +149,7 @@
 				_message = message
 				// 根据消息类型做对应处理
 				var messageType = message.messageType;
-				log("commandWatch->", messageType, "->",  message)
+				log("commandWatch->", messageType, "->", message)
 				toast(messageType)
 			};
 			rongCallLib.commandWatch(commandWatcher);
@@ -160,7 +162,7 @@
 				conversationType: RongIMLib.CONVERSATION_TYPE.PRIVATE,
 				targetId: targetId,
 				inviteUserIds: [targetId],
-				mediaType: RongCallLib.VoIPMediaType.MEDIA_VEDIO,
+				mediaType,
 				extra: {
 					name: "扩展字段"
 				}
@@ -183,7 +185,7 @@
 			var params = {
 				conversationType: _message.conversationType,
 				targetId: _message.targetId,
-				mediaType: RongCallLib.VoIPMediaType.MEDIA_VEDIO
+				mediaType
 			};
 			rongCallLib.accept(params, function (error) {
 				if (error) {
@@ -257,10 +259,10 @@
 		function toast(msg, time = 1000) {
 			Utils.toast(msg, time)
 		}
-        const removeVideoEl = () => {
-            const videoWrapEl = document.getElementById('box');
-            videoWrapEl.innerHTML = '';
-        };
+		const removeVideoEl = () => {
+			const videoWrapEl = document.getElementById('box');
+			videoWrapEl.innerHTML = '';
+		};
 		var log = (tag, ...args) => {
 			console.log(tag, new Date().toISOString(), ...args)
 		}
