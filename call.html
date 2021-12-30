@@ -8,11 +8,11 @@
 	<title>Document</title>
 </head>
 <!-- IMLib SDK -->
-<script src="https://cdn.ronghub.com/RongIMLib-4.5.3.prod.js"></script>
+<script src="https://cdn.ronghub.com/RongIMLib-4.4.8.prod.js"></script>
 <!-- RTCLib v5 -->
 <!-- 5.1.8 修复在 IOS 上不能播放视频问题 -->
 <!-- <script src="https://cdn.ronghub.com/RCRTC-5.1.0.prod.js"></script> -->
-<script src="https://cdn.ronghub.com/RCRTC-5.2.latest.js"></script>
+<script src="https://cdn.ronghub.com/RCRTC-5.1.1.prod.js"></script>
 <!-- RCRTCAdapter -->
 <script src="https://cdn.ronghub.com/RCRTCAdapter-1.0.7.prod.js"></script>
 <!-- CallLib SDK -->
@@ -22,6 +22,7 @@
 
 <script src="https://unpkg.com/vconsole/dist/vconsole.min.js"></script>
 <script src="./utils.js"></script>
+<script src="./config.js"></script>
 <script>
 	// VConsole will be exported to `window.VConsole` by default.
 	if ((navigator.userAgent.match(/(iPhone|iPod|Android|ios|iOS|iPad|Backerry|WebOS|Symbian|Windows Phone|Phone)/i))) {
@@ -50,23 +51,10 @@
 	</p>
 	<div id="box"></div>
 	<script>
-		const allen = {
-			appkey: "vnroth0kvahzo",
-			token: "37GlFWd0MztWEhQb6ixrS6ynOhNw/ADqVIl7FZ6ScJQ=@5q2p.cn.rongnav.com;5q2p.cn.rongcfg.com",
-			userId: "allen",
-			targetId: "jack",
-		}
-		const jack = {
-			appkey: "vnroth0kvahzo",
-			token: "/j/O3Utm340sd7VauWc8lPTPm2EGLmNf0ZMlrsMyRyo=@5q2p.cn.rongnav.com;5q2p.cn.rongcfg.com",
-			userId: "jack",
-			targetId: "allen",
-		}
-		const isAllenJack = location.search.includes("allen") || location.search.includes("jack");
-		let appkey = token = userId = targetId = null;
+        let { appkey, token, targetId, userId, logLevel, isHaveUser } = Config;
 		let rongCallLib, _message;
 		const mediaType = Utils.getQueryVariable("type") == 1 ? RongCallLib.VoIPMediaType.MEDIA_AUDIO : RongCallLib.VoIPMediaType.MEDIA_VEDIO
-		isAllenJack && handelConnect();
+		isHaveUser && handelConnect();
 		function handelConnect() {
 			checkValue()
 			const im = RongIMLib.init({ appkey })
@@ -157,7 +145,7 @@
 
 
 		function handelCall() {
-			// checkValue()
+			checkValue()
 			var params = {
 				conversationType: RongIMLib.CONVERSATION_TYPE.PRIVATE,
 				targetId: targetId,
@@ -231,29 +219,20 @@
 				document.getElementById(id).value = value
 			}
 
-			if (location.search.includes("allen")) {
-				appkey = getValue("appkey") || allen.appkey
-				token = getValue("token") || allen.token
-				userId = getValue("userId")
-				targetId = getValue("targetId") || allen.targetId
+			if (isHaveUser) {
+                appkey = getValue("appkey") || appkey
+                token = getValue("token") || token
+                userId = getValue("userId") || userId
+                targetId = getValue("targetId") || targetId
 
-				setValue("appkey", appkey)
-				setValue("token", token)
-				setValue("targetId", targetId)
-			} else if (location.search.includes("jack")) {
-				appkey = getValue("appkey") || jack.appkey
-				token = getValue("token") || jack.token
-				userId = getValue("userId")
-				targetId = getValue("targetId") || jack.targetId
-
-				setValue("appkey", appkey)
-				setValue("token", token)
-				setValue("targetId", targetId)
-			} else {
-				appkey = getValue("appkey")
-				token = getValue("token")
-				targetId = getValue("targetId")
-			}
+                setValue("appkey", appkey)
+                setValue("token", token)
+                setValue("targetId", targetId)
+            } else {
+                appkey = getValue("appkey")
+                token = getValue("token")
+                targetId = getValue("targetId")
+            }
 			console.log(appkey, token, userId, targetId)
 		}
 		function toast(msg, time = 1000) {
