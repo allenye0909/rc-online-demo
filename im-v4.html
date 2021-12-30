@@ -15,11 +15,12 @@
         // const appkey = "kj7swf8oks3n2"
         // const token = "JDFn+CWVmYPqh8l/V+KblyBc75H6uJlixl2+WYCTxdw=@az71.cn.rongnav.com;az71.cn.rongcfg.com"
 
-        const { appkey, token } = Config
+        const { appkey, token, logLevel } = Config
+        console.log("logLevel:", logLevel)
 
 
         // 应用初始化以获取 RongIMLib 实例对象，请务必保证此过程只被执行一次,连接类型推荐使用comet
-        const im = RongIMLib.init({ appkey,  });
+        const im = RongIMLib.init({ appkey,  logLevel});
         window.im = im
 
         // 添加事件监听
