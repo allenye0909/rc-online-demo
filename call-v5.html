@@ -9,6 +9,8 @@
     <script src="https://cdn.ronghub.com/RongIMLib-5.0.1.prod.js"></script>
     <script src="https://cdn.ronghub.com/RCRTC-5.2.latest.js"></script>
     <script src="https://cdn.ronghub.com/RCCall-5.0.latest.js"></script>
+    <script src="./utils.js"></script>
+    <script src="./config.js"></script>
 </head>
 
 <body>
@@ -30,37 +32,24 @@
     <script>
         // console.log(RongIMLib, RCRTC, RCCall) // 顶级变量
 
-        const allen = {
-            appkey: "vnroth0kvahzo",
-            token: "37GlFWd0MztWEhQb6ixrS6ynOhNw/ADqVIl7FZ6ScJQ=@5q2p.cn.rongnav.com;5q2p.cn.rongcfg.com",
-            userId: "allen",
-            targetId: "jack",
-        }
-        const jack = {
-            appkey: "vnroth0kvahzo",
-            token: "/j/O3Utm340sd7VauWc8lPTPm2EGLmNf0ZMlrsMyRyo=@5q2p.cn.rongnav.com;5q2p.cn.rongcfg.com",
-            userId: "jack",
-            targetId: "allen",
-        }
-
-        const isAllenJack = location.search.includes("allen") || location.search.includes("jack");
-
+        let { appkey, token, targetId, userId, logLevel, isHaveUser } = Config;
 
         // RTCLib
         const { installer: rtcInstaller, RCRTCClient, RCTrack, RCFrameRate, RCResolution } = RCRTC
 
         // CallLib
         const { installer: callInstaller, RCCallClient, RCCallSession, RCCallErrorCode, IDeviceChangeParams, ISessionListener, IEndSummary, ISenderInfo, IMuteUser, IInvitedUsers, RCCallLanguage, RCCallEndReason, RCCallMediaType, IOfflineRecord, RCCallSessionState } = RCCall
-        var appkey, token, userId, targetId, rtcClient, caller, _session;
+        var rtcClient, caller, _session;
         const mediaType = Utils.getQueryVariable("type") == 1 ? 1 : 2
 
-        isAllenJack && handelConnect(); // 链接
+        isHaveUser && handelConnect(); // 链接
 
         function handelConnect() {
             checkValue();
             // IM 客户端初始化
             RongIMLib.init({
-                appkey: allen.appkey,
+                appkey,
+                logLevel
             });
 
             // RTC 客户端初始化
@@ -88,6 +77,7 @@
                          */
                         onRinging(sender, session) {
                             const { userId } = sender;
+                            console.log(userId + "已收到呼叫请求")
                         },
 
                         /**
@@ -97,6 +87,7 @@
                          */
                         onAccept(sender, session) {
                             const { userId } = sender;
+                            console.log(userId + "同意接听")
                         },
 
                         /**
@@ -107,6 +98,7 @@
                          */
                         onHungup(sender, reason, session) {
                             const { userId } = sender;
+                            console.log(userId + "挂断")
                         },
 
                         /**
@@ -134,8 +126,8 @@
                 },
             });
 
-            console.log(allen.token)
-            RongIMLib.connect(allen.token)
+            console.log("token:", token)
+            RongIMLib.connect(token)
                 .then((user) => {
                     console.log("链接成功, 链接用户 id 为: ", user.data.userId);
                     document.getElementById('userId').value = user.data.userId
@@ -146,6 +138,7 @@
         }
 
         const handelCall = async () => {
+            checkValue();
             /**
              * 发起单人通话，如果成功后会产生一个新的session
              * @param targetId 被呼叫一方的用户 id   必填
@@ -166,6 +159,7 @@
                      */
                     onRinging(sender, session) {
                         const { userId } = sender;
+                        console.log(userId + "已收到呼叫请求")
                     },
 
                     /**
@@ -175,6 +169,7 @@
                      */
                     onAccept(sender, session) {
                         const { userId } = sender;
+                        console.log(userId + "同意接听")
                     },
 
                     /**
@@ -185,6 +180,7 @@
                      */
                     onHungup(sender, reason, session) {
                         const { userId } = sender;
+                        console.log(userId + "远端挂断")
                     },
 
                     /**
@@ -199,6 +195,7 @@
             });
 
             if (code === RCCallErrorCode.SUCCESS) {
+                _session = session
                 // do something
             }
         }
@@ -224,20 +221,11 @@
                 document.getElementById(id).value = value
             }
 
-            if (location.search.includes("allen")) {
-                appkey = getValue("appkey") || allen.appkey
-                token = getValue("token") || allen.token
-                userId = getValue("userId")
-                targetId = getValue("targetId") || allen.targetId
-
-                setValue("appkey", appkey)
-                setValue("token", token)
-                setValue("targetId", targetId)
-            } else if (location.search.includes("jack")) {
-                appkey = getValue("appkey") || jack.appkey
-                token = getValue("token") || jack.token
-                userId = getValue("userId")
-                targetId = getValue("targetId") || jack.targetId
+            if (isHaveUser) {
+                appkey = getValue("appkey") || appkey
+                token = getValue("token") || token
+                userId = getValue("userId") || userId
+                targetId = getValue("targetId") || targetId
 
                 setValue("appkey", appkey)
                 setValue("token", token)
@@ -247,7 +235,7 @@
                 token = getValue("token")
                 targetId = getValue("targetId")
             }
-            console.log(appkey, token, userId, targetId)
+            console.log("check value: ", appkey, token, userId, targetId)
         }
         function playVideo(track) {
             console.log(track)
