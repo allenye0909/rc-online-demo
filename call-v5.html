@@ -9,6 +9,7 @@
     <script src="https://cdn.ronghub.com/RongIMLib-5.0.1.prod.js"></script>
     <script src="https://cdn.ronghub.com/RCRTC-5.2.latest.js"></script>
     <script src="https://cdn.ronghub.com/RCCall-5.0.latest.js"></script>
+    <script src="https://cdn.ronghub.com/RongEmoji-2.2.7.js"></script>
     <script src="./utils.js"></script>
     <script src="./config.js"></script>
     <style>
@@ -262,6 +263,12 @@
                 video.classList.add("video-" + track.getUserId());
                 box.appendChild(video);
                 track.play(video);
+
+                // ios 15 手动播放视频
+                // video.load();
+                // setTimeout(() => {
+                //     track.play(video);
+                // }, 0);
             }
         }
         /**
