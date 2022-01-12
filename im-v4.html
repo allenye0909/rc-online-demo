@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <script src="./config.js"></script>
-    <script src="https://cdn.ronghub.com/RongIMLib-4.4.7.prod.js"></script>
+    <script src="https://cdn.ronghub.com/RongIMLib-4.3.1.prod.js"></script>
 </head>
 
 <body>
@@ -20,20 +20,21 @@
 
 
         // 应用初始化以获取 RongIMLib 实例对象，请务必保证此过程只被执行一次,连接类型推荐使用comet
-        const im = RongIMLib.init({ appkey,  logLevel});
+        const im = RongIMLib.init({ appkey, logLevel });
         window.im = im
+        let conversationList = []
 
         // 添加事件监听
         im.watch({
             // 监听会话列表变更事件
             conversation(event) {
                 // 假定存在 getExistedConversationList 方法，以获取当前已存在的会话列表数据
-                const conversationList = [];
+                conversationList = [];
                 // 发生变更的会话列表
                 const updatedConversationList = event.updatedConversationList;
                 // 通过 im.Conversation.merge 计算最新的会话列表
                 const latestConversationList = im.Conversation.merge({ conversationList, updatedConversationList })
-                console.log("会话更新：", updatedConversationList)
+                console.log("会话更新：", event.updatedConversationList, conversationList)
             },
             // 监听消息通知
             message(event) {
@@ -79,14 +80,27 @@
                  * }
                  */
                 const deletedExpansion = event.deletedExpansion;
+                console.log("expansion", event, updatedExpansion, deletedExpansion)
             }
         });
 
         im.connect({ token }).then(user => {
             console.log('链接成功, 链接用户 id 为: ', user.id);
+            getConversationList()
         }).catch(error => {
             console.log('链接失败: ', error.code, error.msg);
         });
+
+        function getConversationList() {
+            im.Conversation.getList({
+                count: 30,
+                startTime: 0,
+                order: 0
+            }).then(list => {
+                console.log('获取会话列表成功', list);
+                conversationList = list
+            });
+        }
     </script>
 </body>
 

@@ -23,6 +23,17 @@
         RongIMLib.RongIMClient.init(appkey, '', { logLevel }); //开发者后台 -> 基本信息 获取
 
 
+        // 注册自定义消息
+        // for (let index = 0; index < 10; index++) {
+        //     var messageName = 'PersonMessage' + index;  // 消息名称
+        //     var objectName = 's:person' + index;  // 消息类型名，请按照此格式命名
+        //     var isCounted = true;  // 消息计数
+        //     var isPersited = true;  // 消息保存
+        //     var mesasgeTag = new RongIMLib.MessageTag(isCounted, isPersited);
+        //     var prototypes = ['name', 'age'];  // 消息类中的属性名
+        //     RongIMClient.registerMessageType(messageName, objectName, mesasgeTag, prototypes);
+        // }
+
         /* 连接状态监听器 */
         RongIMClient.setConnectionStatusListener({
             onChanged: function (status) {
@@ -44,6 +55,33 @@
             }
         };
         RongIMClient.setConversationStatusListener(params);
+
+
+
+        RongIMClient.setMessageExpansionListener({
+            onUpdated: function (updatedExpansion) { // 新增、修改扩展监听
+                console.log("新增、修改扩展监听", updatedExpansion)
+                /*
+                  updatedExpansion: {
+                    expansion: { key: value },
+                    messageUId: 'BKCP-VBUT-0006-9GPP'
+                  }
+                */
+                var expansion = updatedExpansion.expansion;   // 新增、修改的扩展信息
+                var messageUId = updatedExpansion.messageUId; // 扩展消息的 messageUId
+            },
+            onDeleted: function (deletedExpansion) { // 删除扩展监听
+                console.log("删除扩展监听", deletedExpansion)
+                /*
+                  deletedExpansion: {
+                    deletedKeys: ['key1', 'key2'],
+                    messageUId: 'BKCP-VBUT-0006-9GPP'
+                  }
+                */
+                let deletedKeys = deletedExpansion.deletedKeys; // 删除扩展的 keys
+                let messageUId = deletedExpansion.messageUId;   //扩展消息的 messageUId
+            }
+        })
 
 
         /* 开发者后台获取或 Server API */
