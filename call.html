@@ -32,7 +32,15 @@
 
 
 <body>
-	<p>
+	<div>
+		<h3>使用方法：</h3>
+		<pre>
+	不加用户（比如 jack）输入框则为空
+	用户   切换：location.search.includes("allen") ? allen : location.search.includes("jack") ? jack : location.search.includes("user1") ? user1 : location.search.includes("user2") ? user2 : test
+	会话类型切换：const conversationType = location.search.includes("conversationType") === 3 ? 3 : 1;
+	资源类型切换：const mediaType = Utils.getQueryVariable("type") == 1 ? RongCallLib.VoIPMediaType.MEDIA_AUDIO : RongCallLib.VoIPMediaType.MEDIA_VEDIO
+	日志类型切换：logLevel: location.search.includes("logLevel") ? 0 : null
+		</pre>
 		<p>type:1 为音频呼叫；2 为 音视频呼叫</p>
 		<span>appkey：</span><input id="appkey" type="text" value="" placeholder="请输入 appkey" autocomplete="off">
 		<span>token：</span><input id="token" type="text" value="" placeholder="请输入 token" autocomplete="off">
@@ -46,13 +54,13 @@
 		<input type="button" value="mute" onclick="mute()">
 		<input type="button" value="unmute" onclick="unmute()">
 		<input type="button" value="userAgent" onclick="alert(navigator.userAgent)">
-
-
-	</p>
+	</div>
 	<div id="box"></div>
 	<script>
-        let { appkey, token, targetId, userId, logLevel, isHaveUser } = Config;
+		let { appkey, token, targetId, userId, logLevel, isHaveUser, inviteId, groupId } = Config;
 		let rongCallLib, _message;
+		const conversationType = location.search.includes("conversationType") === 3 ? 3 : 1;
+		console.log("conversationType->", conversationType)
 		const mediaType = Utils.getQueryVariable("type") == 1 ? RongCallLib.VoIPMediaType.MEDIA_AUDIO : RongCallLib.VoIPMediaType.MEDIA_VEDIO
 		isHaveUser && handelConnect();
 		function handelConnect() {
@@ -147,9 +155,10 @@
 		function handelCall() {
 			checkValue()
 			var params = {
-				conversationType: RongIMLib.CONVERSATION_TYPE.PRIVATE,
-				targetId: targetId,
-				inviteUserIds: [targetId],
+				conversationType,
+				targetId: conversationType === 3 ? groupId : targetId,
+				// inviteUserIds	Array	被邀请人 ID, 最多支持 7 人. 单聊时, 只填入 targetId 即可
+				inviteUserIds: conversationType === 3 ? [inviteId, targetId] : [targetId],
 				mediaType,
 				extra: {
 					name: "扩展字段"
@@ -188,8 +197,8 @@
 
 		function handelHungup() {
 			var params = {
-				conversationType: RongIMLib.CONVERSATION_TYPE.PRIVATE,
-				targetId: targetId
+				conversationType,
+				targetId: conversationType === 3 ? groupId : targetId
 			};
 			rongCallLib.hungup(params, function (error) {
 				if (error) {
@@ -220,19 +229,19 @@
 			}
 
 			if (isHaveUser) {
-                appkey = getValue("appkey") || appkey
-                token = getValue("token") || token
-                userId = getValue("userId") || userId
-                targetId = getValue("targetId") || targetId
+				appkey = getValue("appkey") || appkey
+				token = getValue("token") || token
+				userId = getValue("userId") || userId
+				targetId = getValue("targetId") || targetId
 
-                setValue("appkey", appkey)
-                setValue("token", token)
-                setValue("targetId", targetId)
-            } else {
-                appkey = getValue("appkey")
-                token = getValue("token")
-                targetId = getValue("targetId")
-            }
+				setValue("appkey", appkey)
+				setValue("token", token)
+				setValue("targetId", targetId)
+			} else {
+				appkey = getValue("appkey")
+				token = getValue("token")
+				targetId = getValue("targetId")
+			}
 			console.log(appkey, token, userId, targetId)
 		}
 		function toast(msg, time = 1000) {

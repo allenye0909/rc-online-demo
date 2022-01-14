@@ -7,8 +7,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <script src="./config.js"></script>
-    <script src="https://cdn.ronghub.com/RongIMLib-5.0.1.prod.js"></script>
-    <!-- <script src="./dist/RongIMLib-5.0.2.js"></script> -->
+    <!-- <script src="https://cdn.ronghub.com/RongIMLib-5.0.1.prod.js"></script> -->
+    <script src="./dist/RongIMLib-5.0.3.js"></script>
     <!-- <script src="./assets/js/RongIMLib-5.0.0.prod.js"></script> -->
 </head>
 
@@ -19,7 +19,8 @@
     </p>
     <div>
         <h6>特殊操作：</h6>
-        <p>消息扩展<button></button></p>
+        <p>消息扩展<button onclick="handelSendAndUpdateExpansion()">发送&更新带扩展的消息</button></p>
+        <p>群聊消息回执<button onclick="handelSendRRS()">发送群消息 并 发送群响应回执请求</button></p>
     </div>
     <script>
         // const appkey = "8brlm7uf8ozt3"
@@ -78,8 +79,10 @@
             console.log('rrq 消息回执请求监听事件', conversation, messageUId)
         });
 
-        RongIMLib.addEventListener(Events.MESSAGE_RECEIPT_RESPONSE, ({ conversation, messageUId, responseUserIdList }) => {
-            console.log("rrs 消息回执响应监听事件", conversation, messageUId, responseUserIdList)
+        RongIMLib.addEventListener(Events.MESSAGE_RECEIPT_RESPONSE, (res) => {
+            const { conversation, messageUIdList, receivedUserId } = res;
+            console.log(res)
+            console.log("rrs 消息回执响应监听事件", conversation, messageUIdList, receivedUserId)
         });
 
         RongIMLib.connect(token).then((res) => {
@@ -94,16 +97,45 @@
             window.file = params.target.files[0];
         }
 
-        // const message = new RongIMLib.TextMessage({ content: '123' })
-        // // 发送
-        // RongIMLib.sendMessage({ conversationType: 3, targetId: 'group1' }, message, { canIncludeExpansion: true, expansion: { key: 'value' } }).then(res => { console.log(res), window._message = res.data })
-        // RongIMLib.updateMessageExpansion({ key1: 'val1', key2: 'val2' }, _message).then(res => {
-        //     if (res.code === 0) {
-        //         console.log(res.code, '更新成功')
-        //     } else {
-        //         console.log(res.code, res.msg)
-        //     }
-        // })
+        function handelSendAndUpdateExpansion() {
+            const message = new RongIMLib.TextMessage({ content: '测试发送扩展消息' })
+            // 发送消息
+            RongIMLib.sendMessage({ conversationType: 3, targetId: 'group1' }, message, { canIncludeExpansion: true, expansion: { key: 'value' } }).then(res => {
+                console.log("发送消息成功->", res)
+                let conversation = {
+                    conversationType: res.data.conversationType || res.data.type,
+                    targetId: res.data.targetId
+                }
+                // 更新扩展
+                RongIMLib.updateMessageExpansion({ key1: 'val1', key2: 'val2', ...conversation }, res.data).then(res => {
+                    if (res.code === 0) {
+                        console.log(res, '更新成功')
+                    } else {
+                        console.log(res.code, res.msg)
+                    }
+                })
+            })
+
+        }
+
+        function handelSendRRS() {
+            const conversation = { conversationType: 3, targetId: 'group1' }
+            // 实例化待发送消息，RongIMLib.TextMessage 为内置文本型消息
+            const message = new RongIMLib.TextMessage({ content: '发送群组回执测试消息' })
+            // 发送
+            RongIMLib.sendMessage(conversation, message).then(resp => {
+                console.log(resp.data)
+                RongIMLib.sendReadReceiptRequest(resp.data.targetId, resp.data.messageUId).then(res => {
+                    if (res.code === 0) {
+                        console.log(res.code, res.data)
+                    } else {
+                        console.log(res.code, res.msg)
+                    }
+                }).catch(error => {
+                    console.log(error)
+                })
+            })
+        }
 
     </script>
 </body>
