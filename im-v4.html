@@ -11,6 +11,8 @@
 </head>
 
 <body>
+    <button onclick="handelConnect()">connect</button>
+    <button onclick="handelDisconnect()">disconnect</button>
     <script>
         // const appkey = "kj7swf8oks3n2"
         // const token = "JDFn+CWVmYPqh8l/V+KblyBc75H6uJlixl2+WYCTxdw=@az71.cn.rongnav.com;az71.cn.rongcfg.com"
@@ -84,13 +86,6 @@
             }
         });
 
-        im.connect({ token }).then(user => {
-            console.log('链接成功, 链接用户 id 为: ', user.id);
-            getConversationList()
-        }).catch(error => {
-            console.log('链接失败: ', error.code, error.msg);
-        });
-
         function getConversationList() {
             im.Conversation.getList({
                 count: 30,
@@ -100,6 +95,20 @@
                 console.log('获取会话列表成功', list);
                 conversationList = list
             });
+        }
+
+        function handelConnect() {
+            im.connect({ token }).then(user => {
+                console.log('链接成功, 链接用户 id 为: ', user.id);
+                getConversationList()
+            }).catch(error => {
+                console.log('链接失败: ', error.code, error.msg);
+            });
+        }
+        handelConnect()
+
+        function handelDisconnect() {
+            im.disconnect().then(() => console.log('断开链接成功'));
         }
     </script>
 </body>

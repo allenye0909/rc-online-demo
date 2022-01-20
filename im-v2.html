@@ -11,6 +11,9 @@
 </head>
 
 <body>
+    
+    <button onclick="handelConnect()">connect</button>
+    <button onclick="handelDisconnect()">disconnect</button>
     <script>
         // const appkey = "8brlm7uf8ozt3"
         // const token = "2v8tmW2mQLXfViA2C6p0Jm1hC0xv/+xhxFY4yoL9rhg=@vyzw.cn.rongnav.com;vyzw.cn.rongcfg.com"
@@ -20,7 +23,12 @@
 
         // 应用初始化以获取 RongIMLib 实例对象，请务必保证此过程只被执行一次,连接类型推荐使用comet
 
-        RongIMLib.RongIMClient.init(appkey, '', { logLevel }); //开发者后台 -> 基本信息 获取
+        // RongIMLib.RongIMClient.init(appkey, '', { logLevel }); //开发者后台 -> 基本信息 获取
+        RongIMLib.RongIMClient.init(appkey, null, {
+            navi: '', // 私有部署配置，公有云用户可忽略
+            api: '', // 私有部署配置，公有云用户可忽略
+            logLevel: logLevel
+        });
 
 
         // 注册自定义消息
@@ -85,18 +93,27 @@
 
 
         /* 开发者后台获取或 Server API */
-        RongIMClient.connect(token, {
-            onSuccess: function (userId) {
-                console.log('连接成功, 用户 ID 为', userId);
-                // 连接已成功, 此时可通过 getConversationList 获取会话列表并展示
-            },
-            onTokenIncorrect: function () {
-                console.log('连接失败, 失败原因: token 无效');
-            },
-            onError: function (errorCode) {
-                console.log('连接失败, 失败原因: ', errorCode);
-            }
-        });
+        function handelConnect() {
+            RongIMClient.connect(token, {
+                onSuccess: function (userId) {
+                    console.log('连接成功, 用户 ID 为', userId);
+                    // 连接已成功, 此时可通过 getConversationList 获取会话列表并展示
+                },
+                onTokenIncorrect: function () {
+                    console.log('连接失败, 失败原因: token 无效');
+                },
+                onError: function (errorCode) {
+                    console.log('连接失败, 失败原因: ', errorCode);
+                }
+            });
+        }
+
+        handelConnect();
+
+        function handelDisconnect() {
+            RongIMClient.getInstance().disconnect()
+            console.log("disconnect>>>>")
+        }
 
     </script>
 </body>

@@ -5,9 +5,34 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="./assets/meeting/css/style.css">
-  <title>Web RTC Meeting V5 Quick Demo</title>
-  <script src="./config.js"></script>
+  <link rel="stylesheet" href="../assets/living/css/style.css">
+  <style>
+    .liveurl-wrap {
+      text-align: left;
+      width: 80%;
+      margin: 30px auto 0;
+      color: white;
+    }
+
+    #liveurl-input {
+      width: 100%;
+      margin-top: 10px;
+      resize: none;
+      border: none;
+      outline: none;
+      background: #333;
+      color: white;
+      font: 15px Arial;
+      line-height: 20px;
+    }
+
+    .liveurl-wrap .tips {
+      margin-left: 10px;
+      color: red;
+      font-size: 15px;
+    }
+  </style>
+  <title>Web RTC Living V5 Quick Demo</title>
   <script src="https://unpkg.com/vconsole/dist/vconsole.min.js"></script>
   <script>
     // VConsole will be exported to `window.VConsole` by default.
@@ -15,13 +40,12 @@
       new window.VConsole();
     }
   </script>
+  <script src="./config.js"></script>
 </head>
 
 <body>
   <div class="rong-container">
-    <p>37GlFWd0MztWEhQb6ixrS6ynOhNw/ADqVIl7FZ6ScJQ=@5q2p.cn.rongnav.com;5q2p.cn.rongcfg.com</p>
-    <p>/j/O3Utm340sd7VauWc8lPTPm2EGLmNf0ZMlrsMyRyo=@5q2p.cn.rongnav.com;5q2p.cn.rongcfg.com</p>
-    <h3 class="rong-title"> Web RTC Meeting V5 Quick Demo </h3>
+    <h3 class="rong-title"> Web RTC Living V5 Quick Demo </h3>
     <div class="rong-login-box">
       <div class="im-wrap">
         <div class="input-wrap">
@@ -64,7 +88,7 @@
           <span class="arrow vertical-arrow leave-repeat-line">--------></span>
         </div>
         <div class="input-wrap">
-          <input class="rong-input" type="button" value="加入房间" onclick="joinRoom(this)">
+          <input class="rong-input" type="button" value="加入直播房间" onclick="joinRoom(this)">
           <span class="arrow vertical-arrow leave-repeat-line">--------></span>
         </div>
         <div class="input-wrap">
@@ -89,15 +113,20 @@
           <------------------------< /span>
             <div class="tips">离开房间后，可重新加入房间继续后续流程</div>
       </div>
+      <div class="liveurl-wrap">
+        liveUrl:<span class="tips">(可在主播端输入 liveUrl 订阅观看)</span>
+        <textarea id="liveurl-input" rows="4" spellcheck="false"></textarea>
+      </div>
       <div id="rong-video-box"></div>
     </div>
   </div>
   <!-- RongIMLib -->
   <script src="https://cdn.ronghub.com/RongIMLib-4.4.1.prod.js"></script>
   <!-- RTCLib v5 -->
-  <script src="https://cdn.ronghub.com/RCRTC-5.1.1.prod.js"></script>
-  <script src="./assets/meeting/js/im.js"></script>
-  <script src="./assets/meeting/js/rtc.js"></script>
+  <!-- <script src="https://cdn.ronghub.com/RCRTC-5.1.1.prod.js"></script> -->
+  <script src="https://cdn.ronghub.com/RCRTC-5.1.9.prod.js"></script>
+  <script src="../assets/living/js/im.js"></script>
+  <script src="../assets/living/js/anchor.js"></script>
   <script>
     const inputChangeFn = (e) => {
       if (e.value) {
