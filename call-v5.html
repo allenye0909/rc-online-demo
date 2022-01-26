@@ -70,6 +70,7 @@
                  * 被动收到邀请 （收到一个远端发起的新会话）, 会产生一个新的 session 对象 （必填）
                  */
                 onSession(session) {
+                    console.log('收到一个远端发起的新会话:', session)
                     _session = session
                     /** 
                      * **收到新的 session 后需要立即注册事件监听**
@@ -82,6 +83,7 @@
                          * @param session 当前的 session 对象
                          */
                         onRinging(sender, session) {
+                            console.log(sender, session)
                             const { userId } = sender;
                             console.log(userId + "已收到呼叫请求")
                         },
@@ -93,6 +95,7 @@
                          */
                         onAccept(sender, session) {
                             const { userId } = sender;
+                            console.log(sender)
                             console.log(userId + "同意接听")
                         },
 
@@ -104,7 +107,7 @@
                          */
                         onHungup(sender, reason, session) {
                             const { userId } = sender;
-                            console.log(userId + "挂断")
+                            console.log(userId + "远端挂断", ",原因是：", reason)
                         },
 
                         /**
@@ -115,6 +118,22 @@
                         onTrackReady(track, session) {
                             playVideo(track)
                         },
+                        // 用户状态变更
+                        onUserStateChange(state) {
+                            console.log("用户状态变更", state)
+                        },
+                        // 房间状态变更
+                        onStateChange(info) {
+                            conosle.log("房间状态变更", info)
+                        },
+                        // 收到人员变更
+                        onMemberModify(user) {
+                            console.log("收到人员变更", user)
+                        },
+                        // 收到通话类型变更 (通话降级)
+                        onMediaModify(type) {
+                            console.log("收到通话类型变更 (通话降级)", type)
+                        }
                     });
                 },
 
@@ -128,7 +147,7 @@
                  *  @param summaryInfo 结束一个 session 的后汇总信息
                  */
                 onSessionClose(session, summaryInfo) {
-
+                    console.log("结束通话-onSessionClose", session, summaryInfo)
                 },
             });
 
@@ -165,6 +184,7 @@
                      */
                     onRinging(sender, session) {
                         const { userId } = sender;
+                        console.log(sender)
                         console.log(userId + "已收到呼叫请求")
                     },
 
@@ -175,6 +195,7 @@
                      */
                     onAccept(sender, session) {
                         const { userId } = sender;
+                        console.log(sender)
                         console.log(userId + "同意接听")
                     },
 
@@ -186,7 +207,7 @@
                      */
                     onHungup(sender, reason, session) {
                         const { userId } = sender;
-                        console.log(userId + "远端挂断")
+                        console.log(userId + "远端挂断", ",原因是：", reason)
                     },
 
                     /**
