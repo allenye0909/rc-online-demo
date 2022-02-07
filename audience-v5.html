@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.ronghub.com/RongIMLib-5.0.1.prod.js"></script>
+    <script src="https://cdn.ronghub.com/RCRTC-5.2.latest.js"></script>
+    <script src="./config.js"></script>
+    <script src="./assets/js/im-v5.js"></script>
+    <title>Document</title>
+</head>
+
+<body>
+    <div id="box"></div>
+    <script>
+        const rtcClient = RongIMLib.installPlugin(rtcInstaller, { /*初始化参数请参考下方参数说明*/ })
+
+        async function handelJoinLivingRoomAsAudience() {
+            const { room: audienceRoom, RTCTracks, MCUTracks, CDNUris, userIds, code } = await rtcClient.joinLivingRoomAsAudience('roomId', 0)
+            // 若加入失败，则 room 值为 undefined
+            if (code !== RCRTCCode.SUCCESS) {
+                console.log('join room as audience failed:', code)
+            }
+            console.log("join room success");
+
+            // audienceRoom 为观众加入房间返回的 room
+            // 注册房间事件监听器，重复注册时，仅最后一次有效
+            audienceRoom.registerRoomEventListener({
+                /**
+                 * 主播加入
+                 * @param userIds 加入的主播 id 列表
+                 */
+                onAnchorJoin(userIds) {
+                    console.log("主播加入", userIds)
+                },
+                /**
+                 * 主播离开
+                 * @param userIds 离开的主播 id 列表
+                 */
+                onAnchorLeave(userIds) {
+                },
+                /*
+                 * 房间内直播合流资源发布
+                 * @param track RCRemoteTrack 类实例
+                 * * 房间类型以第一个加入房间用户设置的直播类型为准
+                 * * 房间直播类型为 RCLivingType.AUDIO_VIDEO ，tracks 包含 RCRemoteAudioTrack 与 RCRemoteVideoTrack 实例
+                 * * 直播类型为 RCLivingType.AUDIO ， tracks 仅包含 RCRemoteAudioTrack 实例
+                 * * 触发时机: 主播发布资源后
+                 */
+                async onTrackPublish(tracks) {
+                    console.log("房间内直播合流资源发布", tracks)
+                    const { code } = await audienceRoom.subscribe(tracks)
+                    if (code !== RCRTCCode.SUCCESS) {
+                        console.log('资源订阅失败 ->', code)
+                    }
+                },
+                /*
+                 * 房间内直播合流资源取消发布
+                 * @param track RCRemoteTrack 类实例
+                 * * 触发时机: 全部主播退出房间（因资源为多个主播发布的合流资源，单个主播取消发布不会触发）
+                 */
+                onTrackUnpublish(tracks) {
+                },
+                /*
+                 * 房间内主播资源发布
+                 * @param track RCRemoteTrack 类实例
+                 * * 触发时机: 主播发布资源后
+                 */
+                async onAnchorTrackPublish(tracks) {
+                    console.log("房间内主播资源发布", tracks)
+                    const { code } = await audienceRoom.subscribe(tracks)
+                    if (code !== RCRTCCode.SUCCESS) {
+                        console.log('资源订阅失败 ->', code)
+                    }
+                },
+                /*
+                 * 房间内主播资源取消发布
+                 * @param track RCRemoteTrack 类实例
+                 * * 触发时机: 主播取消发布资源后
+                 */
+                onAnchorTrackUnpublish(tracks) {
+                },
+                /**
+                 * 订阅的音视频流通道已建立, track 已可以进行播放
+                 * @param track RCRemoteTrack 类实例
+                 */
+                onTrackReady(track) {
+                    playVideo(track)
+                }
+            })
+        }
+
+        setTimeout(() => {
+            handelJoinLivingRoomAsAudience();
+        }, 1500);
+        function playVideo(track) {
+            // video:play() failed because the user didn't interact with the document first
+            // https://www.jianshu.com/p/06179ca12dfa
+            console.log(track)
+            // track.isLocalTrack() 是否为本地资源
+            // track.isAudioTrack() 是否为音频
+            // track.isVideoTrack() 是否为视频
+            // track.getUserId()    产生该 track 的用户id
+
+            // 远程的音频直接播放, 为了减少回音，可不播放本端音频
+            if (track.isAudioTrack()) {
+                // track.play();
+            }
+
+            // 视频在对应的容器里播放
+            if (track.isVideoTrack()) {
+                const box = document.getElementById("box");
+                const video = document.createElement("video");
+                video.muted = true
+                video.classList.add("video-" + track._id);
+                box.appendChild(video);
+                track.play(video);
+
+
+                // ios 15 手动播放视频
+                // video.load();
+                // setTimeout(() => {
+                //     track.play(video);
+                // }, 0);
+            }
+        }
+    </script>
+</body>
+
+</html>
