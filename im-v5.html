@@ -21,6 +21,9 @@
         <h6>特殊操作：</h6>
         <p>消息扩展<button onclick="handelSendAndUpdateExpansion()">发送&更新带扩展的消息</button></p>
         <p>群聊消息回执<button onclick="handelSendRRS()">发送群消息 并 发送群响应回执请求</button></p>
+
+        <button onclick="handelAddWatch()">添加监听</button>
+        <button onclick="handelRemoveWatch()">移除监听</button>
     </div>
     <script>
         // const appkey = "8brlm7uf8ozt3"
@@ -135,6 +138,18 @@
                     console.log(error)
                 })
             })
+        }
+
+
+        function handelAddWatch(params) {
+            RongIMLib.addEventListener(Events.MESSAGES, function (messages) {
+                console.log("消息监听：", messages);
+            });
+        }
+
+        function handelRemoveWatch(params) {
+            console.log(handelRemoveWatch)
+            RongIMLib.removeEventListeners(Events.MESSAGES);
         }
 
     </script>
