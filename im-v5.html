@@ -22,7 +22,7 @@
         <button onclick="handelSend(3)">发送群组消息</button>
         <h6>特殊操作：</h6>
         <p>消息扩展<button onclick="handelSendAndUpdateExpansion()">发送&更新带扩展的消息</button></p>
-        <p>群聊消息回执<button onclick="handelSendRRS()">发送群消息 并 发送群响应回执请求</button></p>
+        <p>群聊消息回执<button onclick="handelSendRRReq()">发送群消息 并 发送群响应回执请求</button></p>
         <button onclick="handelAddWatch()">添加监听</button>
         <button onclick="handelRemoveWatch()">移除监听</button>
     </div>
@@ -45,7 +45,7 @@
         });
 
         RongIMLib.addEventListener(Events.MESSAGES, function (messages) {
-            console.log("消息监听：", messages);
+            console.log(new Date().toISOString(), "消息监听：", messages);
         });
 
         /**
@@ -122,16 +122,16 @@
 
         }
 
-        function handelSendRRS() {
+        function handelSendRRReq() {
             const conversation = { conversationType: 3, targetId: 'group1' }
             // 实例化待发送消息，RongIMLib.TextMessage 为内置文本型消息
             const message = new RongIMLib.TextMessage({ content: '发送群组回执测试消息' })
             // 发送
             RongIMLib.sendMessage(conversation, message).then(resp => {
-                console.log(resp.data)
+                console.log("发送消息成功：", resp.data)
                 RongIMLib.sendReadReceiptRequest(resp.data.targetId, resp.data.messageUId).then(res => {
                     if (res.code === 0) {
-                        console.log(res.code, res.data)
+                        console.log("发送群回执请求成功：", res.code, res.data)
                     } else {
                         console.log(res.code, res.msg)
                     }
@@ -157,7 +157,7 @@
             const message = new RongIMLib.TextMessage({ content: '发送 test 群组消息' })
             // 发送消息
             RongIMLib.sendMessage({ conversationType, targetId: conversationType === 1 ? targetId : groupId }, message, { canIncludeExpansion: true, expansion: { key: 'value' } }).then(res => {
-                console.log("发送消息成功->", res)
+                console.log(new Date().toISOString(), "发送消息成功->", res)
                 let conversation = {
                     conversationType: res.data.conversationType || res.data.type,
                     targetId: res.data.targetId

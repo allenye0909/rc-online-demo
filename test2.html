@@ -26,13 +26,11 @@
         function loadScript(src, callback) {
             if (!src) return src;
             var script = document.createElement("script");
+            script.src = src;
+            document.head.appendChild(script);
             script.onload = function () {
                 if (!!callback) callback();
             };
-
-            script.src = src;
-            document.head.appendChild(script);
-
         }
 
         loadScript(list[0], function () {
@@ -124,7 +122,7 @@
                 conversationType: RongIMLib.CONVERSATION_TYPE.PRIVATE,
                 targetId: 'allen',
                 inviteUserIds: ['allen'],
-				mediaType: RongCallLib.VoIPMediaType.MEDIA_VEDIO
+                mediaType: RongCallLib.VoIPMediaType.MEDIA_VEDIO
 
             };
             console.log("执行 call 了")

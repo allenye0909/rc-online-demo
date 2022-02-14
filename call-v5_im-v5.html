@@ -31,6 +31,16 @@
     <button onclick="handelCall()">call</button>
     <button onclick="handelAccept()">accept</button>
     <button onclick="handelHungup()">hungup</button>
+    <br>
+    <button onclick="handelDisableVideoTrack()">禁用视频</button>
+    <button onclick="handelEnableVideoTrack()">启用视频</button>
+    <button onclick="handelDisableAudioTrack()">禁用音频</button>
+    <button onclick="handelEnableAudioTrack()">启用音频</button>
+
+
+
+
+
 
 
     <div id="box"></div>
@@ -124,7 +134,7 @@
                         },
                         // 房间状态变更
                         onStateChange(info) {
-                            conosle.log("房间状态变更", info)
+                            console.log("房间状态变更", info)
                         },
                         // 收到人员变更
                         onMemberModify(user) {
@@ -133,7 +143,24 @@
                         // 收到通话类型变更 (通话降级)
                         onMediaModify(type) {
                             console.log("收到通话类型变更 (通话降级)", type)
-                        }
+                        },
+                        /**
+                         * 对方静音后触发
+                         * @param muteUser 已静音的用户
+                         * @param session  当前的 session 对象
+                         */
+                        onAudioMuteChange: (muteUser, session) => {
+                            console.log("onAudioMuteChange", muteUser)
+                        },
+
+                        /**
+                         * 对方禁用视频后触发
+                         * @param muteUser 已禁用视频的用户
+                         * @param session  当前的 session 对象
+                         */
+                        onVideoMuteChange: (muteUser, session) => {
+                            console.log("onVideoMuteChange", muteUser)
+                        },
                     });
                 },
 
@@ -218,6 +245,41 @@
                     onTrackReady(track, session) {
                         playVideo(track)
                     },
+
+                    // 用户状态变更
+                    onUserStateChange(state) {
+                        console.log("用户状态变更", state)
+                    },
+                    // 房间状态变更
+                    onStateChange(info) {
+                        console.log("房间状态变更", info)
+                    },
+                    // 收到人员变更
+                    onMemberModify(user) {
+                        console.log("收到人员变更", user)
+                    },
+                    // 收到通话类型变更 (通话降级)
+                    onMediaModify(type) {
+                        console.log("收到通话类型变更 (通话降级)", type)
+                    },
+
+                    /**
+                     * 对方静音后触发
+                     * @param muteUser 已静音的用户
+                     * @param session  当前的 session 对象
+                     */
+                    onAudioMuteChange: (muteUser, session) => {
+                        console.log("onAudioMuteChange", muteUser)
+                    },
+
+                    /**
+                     * 对方禁用视频后触发
+                     * @param muteUser 已禁用视频的用户
+                     * @param session  当前的 session 对象
+                     */
+                    onVideoMuteChange: (muteUser, session) => {
+                        console.log("onVideoMuteChange", muteUser)
+                    },
                 },
             });
 
@@ -298,6 +360,56 @@
             const videoWrapEl = document.getElementById('box');
             videoWrapEl.innerHTML = '';
         };
+
+
+        async function handelDisableVideoTrack() {
+
+            const { code } = await _session.disableVideoTrack()
+
+            console.log(code)
+            if (code === RCCallErrorCode.SUCCESS) {
+                // do something
+                console.log(code, ">>>>")
+            }
+        }
+
+
+        async function handelEnableVideoTrack() {
+
+            const { code } = await _session.enableVideoTrack()
+
+            console.log(code)
+            if (code === RCCallErrorCode.SUCCESS) {
+                // do something
+                console.log(code, ">>>>")
+            }
+        }
+
+
+
+        function handelDisableAudioTrack() {
+            _session.disableAudioTrack()
+
+            // const { code } = await _session.disableAudioTrack()
+
+            // console.log(code)
+            // if (code === RCCallErrorCode.SUCCESS) {
+            //     // do something
+            //     console.log(code, ">>>>")
+            // }
+        }
+
+        function handelEnableAudioTrack() {
+            _session.enableAudioTrack()
+
+            // const { code } = await _session.enableAudioTrack()
+
+            // console.log(code)
+            // if (code === RCCallErrorCode.SUCCESS) {
+            //     // do something
+            //     console.log(code, ">>>>")
+            // }
+        }
     </script>
 </body>
 

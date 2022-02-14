@@ -1,8 +1,8 @@
-const allen = { appkey: "vnroth0kvahzo", token: "37GlFWd0MztWEhQb6ixrS6ynOhNw/ADqVIl7FZ6ScJQ=@5q2p.cn.rongnav.com;5q2p.cn.rongcfg.com", userId: "allen", targetId: "jack", inviteId: "test", groupId: "group1", }
-const jack = { appkey: "vnroth0kvahzo", token: "/j/O3Utm340sd7VauWc8lPTPm2EGLmNf0ZMlrsMyRyo=@5q2p.cn.rongnav.com;5q2p.cn.rongcfg.com", userId: "jack", targetId: "allen", inviteId: "test", groupId: "group1", }
-const test = { appkey: "vnroth0kvahzo", token: "IHfcNqNn1wAsd7VauWc8lBanIFO7dI79XIuf+p23t7U=@5q2p.cn.rongnav.com;5q2p.cn.rongcfg.com", userId: "test", targetId: "allen", inviteId: "allen", groupId: "group1", }
-const user1 = { appkey: "vnroth0kvahzo", token: "/n7HE8ezz+dWEhQb6ixrSy9LfehknYvGSsWtVhCVjPI=@5q2p.cn.rongnav.com;5q2p.cn.rongcfg.com", userId: "user1", targetId: "user2", inviteId: "test", groupId: "group1" }
-const user2 = { appkey: "vnroth0kvahzo", token: "AO39MwGwG8RWEhQb6ixrS3WvBHl/dBPfB4iJSMqWTu8=@5q2p.cn.rongnav.com;5q2p.cn.rongcfg.com", userId: "user2", targetId: "user1", inviteId: "test", groupId: "group1" }
+const allen = { appkey: "kj7swf8oks5h2", token: "5CSrDk0iEhZGA1kXqdGsGMVZrzNyMZk7ftmgyTzh3q0=@af01.cn.rongnav.com;af01.cn.rongcfg.com", userId: "allen", targetId: "jack", inviteId: "test", groupId: "group1", }
+const jack = { appkey: "kj7swf8oks5h2", token: "RmDai+rn1zZnRsqSIi3hm5iWejilT+g4mKEYibOjX7E=@af01.cn.rongnav.com;af01.cn.rongcfg.com", userId: "jack", targetId: "allen", inviteId: "test", groupId: "group1", }
+const test = { appkey: "kj7swf8oks5h2", token: "JIcZGRVYACFnRsqSIi3hm1DKxFEkcMcziWFSKBIw9eg=@af01.cn.rongnav.com;af01.cn.rongcfg.com", userId: "test", targetId: "allen", inviteId: "allen", groupId: "group1", }
+const user1 = { appkey: "kj7swf8oks5h2", token: "FMocZSlCDOdGA1kXqdGsGGd0pB3UKnlWjxVQ3XX//hY=@af01.cn.rongnav.com;af01.cn.rongcfg.com", userId: "user1", targetId: "user2", inviteId: "test", groupId: "group1" }
+const user2 = { appkey: "kj7swf8oks5h2", token: "UUXzdvpsgyhGA1kXqdGsGGd0pB3UKnlWWzYPbDpHv3U=@af01.cn.rongnav.com;af01.cn.rongcfg.com", userId: "user2", targetId: "user1", inviteId: "test", groupId: "group1" }
 const Config = {
   // 私有云服务环境下必填
   navi: '',
