@@ -93,9 +93,9 @@
                          * @param session 当前的 session 对象
                          */
                         onRinging(sender, session) {
-                            console.log(sender, session)
+                            console.log("call init ->", sender, session)
                             const { userId } = sender;
-                            console.log(userId + "已收到呼叫请求")
+                            console.log("call init ->", userId + "已收到呼叫请求")
                         },
 
                         /**
@@ -105,8 +105,8 @@
                          */
                         onAccept(sender, session) {
                             const { userId } = sender;
-                            console.log(sender)
-                            console.log(userId + "同意接听")
+                            console.log("call init ->", sender)
+                            console.log("call init ->", userId + "同意接听")
                         },
 
                         /**
@@ -117,7 +117,7 @@
                          */
                         onHungup(sender, reason, session) {
                             const { userId } = sender;
-                            console.log(userId + "远端挂断", ",原因是：", reason)
+                            console.log("call init ->", userId + "远端挂断", ",原因是：", reason)
                         },
 
                         /**
@@ -130,19 +130,19 @@
                         },
                         // 用户状态变更
                         onUserStateChange(state) {
-                            console.log("用户状态变更", state)
+                            console.log("call init ->", "用户状态变更", state)
                         },
                         // 房间状态变更
                         onStateChange(info) {
-                            console.log("房间状态变更", info)
+                            console.log("call init ->", "房间状态变更", info)
                         },
                         // 收到人员变更
                         onMemberModify(user) {
-                            console.log("收到人员变更", user)
+                            console.log("call init ->", "收到人员变更", user)
                         },
                         // 收到通话类型变更 (通话降级)
                         onMediaModify(type) {
-                            console.log("收到通话类型变更 (通话降级)", type)
+                            console.log("call init ->", "收到通话类型变更 (通话降级)", type)
                         },
                         /**
                          * 对方静音后触发
@@ -150,7 +150,7 @@
                          * @param session  当前的 session 对象
                          */
                         onAudioMuteChange: (muteUser, session) => {
-                            console.log("onAudioMuteChange", muteUser)
+                            console.log("call init ->", "onAudioMuteChange", muteUser)
                         },
 
                         /**
@@ -159,7 +159,7 @@
                          * @param session  当前的 session 对象
                          */
                         onVideoMuteChange: (muteUser, session) => {
-                            console.log("onVideoMuteChange", muteUser)
+                            console.log("call init ->", "onVideoMuteChange", muteUser)
                         },
                     });
                 },
@@ -211,8 +211,8 @@
                      */
                     onRinging(sender, session) {
                         const { userId } = sender;
-                        console.log(sender)
-                        console.log(userId + "已收到呼叫请求")
+                        console.log("call ->", sender)
+                        console.log("call ->", userId + "已收到呼叫请求")
                     },
 
                     /**
@@ -222,8 +222,8 @@
                      */
                     onAccept(sender, session) {
                         const { userId } = sender;
-                        console.log(sender)
-                        console.log(userId + "同意接听")
+                        console.log("call ->", sender)
+                        console.log("call ->", userId + "同意接听")
                     },
 
                     /**
@@ -234,7 +234,7 @@
                      */
                     onHungup(sender, reason, session) {
                         const { userId } = sender;
-                        console.log(userId + "远端挂断", ",原因是：", reason)
+                        console.log("call ->", userId + "远端挂断", ",原因是：", reason)
                     },
 
                     /**
@@ -248,19 +248,19 @@
 
                     // 用户状态变更
                     onUserStateChange(state) {
-                        console.log("用户状态变更", state)
+                        console.log("call ->", "用户状态变更", state)
                     },
                     // 房间状态变更
                     onStateChange(info) {
-                        console.log("房间状态变更", info)
+                        console.log("call ->", "房间状态变更", info)
                     },
                     // 收到人员变更
                     onMemberModify(user) {
-                        console.log("收到人员变更", user)
+                        console.log("call ->", "收到人员变更", user)
                     },
                     // 收到通话类型变更 (通话降级)
                     onMediaModify(type) {
-                        console.log("收到通话类型变更 (通话降级)", type)
+                        console.log("call ->", "收到通话类型变更 (通话降级)", type)
                     },
 
                     /**
@@ -269,7 +269,7 @@
                      * @param session  当前的 session 对象
                      */
                     onAudioMuteChange: (muteUser, session) => {
-                        console.log("onAudioMuteChange", muteUser)
+                        console.log("call ->", "onAudioMuteChange", muteUser)
                     },
 
                     /**
@@ -278,7 +278,7 @@
                      * @param session  当前的 session 对象
                      */
                     onVideoMuteChange: (muteUser, session) => {
-                        console.log("onVideoMuteChange", muteUser)
+                        console.log("call ->", "onVideoMuteChange", muteUser)
                     },
                 },
             });
