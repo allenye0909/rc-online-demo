@@ -58,6 +58,22 @@
         var rtcClient, caller, _session;
         const mediaType = Utils.getQueryVariable("type") == 1 ? 1 : 2
 
+        const constraints = {
+            // 视频参数设置
+            video: {
+
+                // 摄像头的deviceId, 以“xxxx”举例
+                // cameraId: "xxxx",
+
+                // 默认帧率为 15
+                frameRate: RCFrameRate.FPS_15,
+
+                // 默认分辨率为 640 * 480
+                resolution: RCResolution.W1280_H720
+            }
+
+        }
+
         isHaveUser && handelConnect(); // 链接
 
         function handelConnect() {
@@ -202,6 +218,7 @@
             const { code, session } = await caller.call({
                 targetId: targetId,
                 mediaType,
+                constraints: constraints,
                 listener: {
 
                     /**
@@ -289,7 +306,7 @@
             }
         }
         const handelAccept = async () => {
-            const { code } = await _session.accept();
+            const { code } = await _session.accept(constraints);
             if (code === RCCallErrorCode.SUCCESS) {
                 // do something
             }
