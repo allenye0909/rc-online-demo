@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <div id="app"></div>
+    <script src="https://cdn.ronghub.com/RCWhiteboard-1.1.1.prod.js"></script>
+    <script>
+        const allen = { appkey: "kj7swf8oks5h2", token: "5CSrDk0iEhZGA1kXqdGsGMVZrzNyMZk7ftmgyTzh3q0=@af01.cn.rongnav.com;af01.cn.rongcfg.com", userId: "allen", targetId: "jack", inviteId: "test", groupId: "group1", }
+
+        const rcWhite = RCWhiteboard.init({ appkey: allen.appkey })
+        rcWhite
+            .joinRoom({
+                token: allen.token,
+                role: 'presenter',
+                hubId: '123456',
+                nickName: '演示者001',
+                hubName: '测试房间001',
+                id: allen.userId,
+            })
+            .then((res) => {
+                document.getElementById('app').appendChild(res)
+            })
+    </script>
+</body>
+
+</html>
