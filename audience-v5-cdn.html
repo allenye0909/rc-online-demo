@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+
+    <input type="text">
+    <button onclick="handelSetup()">设置播放器</button>
+    <button onclick="handelPlayMp4()">播放mp4</button>
+    <div id="playercontainer"></div>
+    <!-- <script src="https://bce.bdstatic.com/jwplayer/3.5.2/cyberplayer.js"></script> -->
+    <script type="text/javascript" src="https://bce.bdstatic.com/jwplayer/3.5.2/cyberplayer.js"></script>
+
+    <script>
+        function handelSetup(params) {
+            const cdnUrl = document.querySelector("input").value;
+            if (!cdnUrl) {
+                return alert("请输入cdn url")
+            }
+            cyberplayer("playercontainer").setup({
+                width: 640,
+                height: 360,
+                isLive: true, // 标明是否是直播
+                file: cdnUrl || "https://113240812pull111.rongcloud.net/c9kqb3rdkbb8j/4E51646D326B706274687A78316835444F65774F54413D3D_640_360_15.flv?wsSecret=cbd7c050f5e68b9ee2582c4bced47c7c&wsTime=62147ebf", // flv直播地址（×一定要支持跨域访问，否则要设置primary参数）
+                autostart: true,
+                stretching: "uniform",
+                volume: 100,
+                controls: true,
+                ak: "0145b321f9a8417d9868d7384db0c96c" // 公有云平台注册即可获得accessKey
+            });
+        }
+
+        function handelPlayMp4() {
+
+            var player = cyberplayer("playercontainer").setup({
+                width: 960, // 宽度，也可以支持百分比(不过父元素宽度要有)
+                height: 540, // 高度，也可以支持百分比
+                title: "基本功能", // 标题
+                file: "http://cyberplayer.bcelive.com/videoworks/mda-kbuhu4wqdi08dwix/cyberplayer/mp4/cyberplayer-demo.mp4", // 播放地址
+                image: "http://cyberplayer.bcelive.com/thumbnail.jpg", // 预览图
+                autostart: false, // 是否自动播放
+                stretching: "uniform", // 拉伸设置
+                repeat: false, // 是否重复播放
+                volume: 100, // 音量
+                controls: true, // controlbar是否显示
+                starttime: 0, // 视频开始播放时间点(单位s)，如果不设置，则可以从上次播放时间点续播
+                logo: { // logo设置
+                    linktarget: "_blank",
+                    margin: 2 + "%",
+                    hide: false,
+                    position: "top-right", // 位置
+                    file: "https://developer.rongcloud.cn/static/img/yunyinguser.jpg" // 图片地址
+                },
+                ak: "0145b321f9a8417d9868d7384db0c96c" // 公有云平台注册即可获得accessKey
+            });
+
+        }
+
+    </script>
+</body>
+
+</html>
