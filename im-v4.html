@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <script src="./config.js"></script>
-    <script src="https://cdn.ronghub.com/RongIMLib-4.3.1.prod.js"></script>
+    <script src="https://cdn.ronghub.com/RongIMLib-4.4.5.prod.js"></script>
 </head>
 
 <body>
@@ -110,6 +110,16 @@
 
         function handelDisconnect() {
             im.disconnect().then(() => console.log('断开链接成功'));
+        }
+
+        function handelRead(message) {
+            var conversation = im.Conversation.get({
+                targetId: message.targetId,
+                type: message.type
+            });
+            conversation.read().then(function () {
+                console.log('清除未读数成功'); // im.watch conversation 将被触发
+            });
         }
     </script>
 </body>
