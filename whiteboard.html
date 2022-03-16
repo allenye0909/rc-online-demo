@@ -9,24 +9,68 @@
 </head>
 
 <body>
-    <div id="app"></div>
+    <!-- <div id="app"></div> -->
     <script src="https://cdn.ronghub.com/RCWhiteboard-1.1.1.prod.js"></script>
     <script>
         const allen = { appkey: "kj7swf8oks5h2", token: "5CSrDk0iEhZGA1kXqdGsGMVZrzNyMZk7ftmgyTzh3q0=@af01.cn.rongnav.com;af01.cn.rongcfg.com", userId: "allen", targetId: "jack", inviteId: "test", groupId: "group1", }
 
-        const rcWhite = RCWhiteboard.init({ appkey: allen.appkey })
-        rcWhite
-            .joinRoom({
-                token: allen.token,
-                role: 'presenter',
-                hubId: '123456',
-                nickName: '演示者001',
-                hubName: '测试房间001',
-                id: allen.userId,
-            })
-            .then((res) => {
-                document.getElementById('app').appendChild(res)
-            })
+        window["rcWhite"] = RCWhiteboard.init({ appkey: allen.appkey })
+
+        function removeDom(params) {
+            document.querySelector("#app").remove();
+        }
+
+        function createDom(params) {
+            const div = document.createElement("div")
+            div.setAttribute("id", "app")
+            document.documentElement.appendChild(div)
+        }
+
+        function joinRoom() {
+            setTimeout(() => {
+                createDom()
+                rcWhite
+                    .joinRoom({
+                        token: allen.token,
+                        role: 'presenter',
+                        hubId: '123456',
+                        nickName: '演示者001',
+                        hubName: '测试房间001',
+                        id: allen.userId,
+                    })
+                    .then((res) => {
+                        document.getElementById('app').appendChild(res)
+                        console.log("joinRoom success")
+                    })
+            });
+        }
+
+
+
+        function quitRoom(params) {
+            setTimeout(() => {
+                rcWhite.quitRoom().then((res) => {
+                    console.log('res:', res)
+                    setTimeout(() => {
+                        removeDom()
+                    }, 1500);
+                })
+            }, 3000);
+        }
+        let index = 0
+        const id = setInterval(() => {
+            joinRoom()
+
+            index < 3 && quitRoom()
+            index++
+        }, 5000);
+
+
+        setTimeout(() => {
+            clearInterval(id)
+        }, 20000);
+
+
     </script>
 </body>
 

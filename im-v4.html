@@ -17,8 +17,12 @@
         // const appkey = "kj7swf8oks3n2"
         // const token = "JDFn+CWVmYPqh8l/V+KblyBc75H6uJlixl2+WYCTxdw=@az71.cn.rongnav.com;az71.cn.rongcfg.com"
 
-        const { appkey, token, logLevel } = Config
+        let { appkey, token, logLevel } = Config
         console.log("logLevel:", logLevel)
+
+        // appkey = "k51hidwqkgyfb"
+        // token = "kkSKMHR/nlvNog9pI71dJFwrnsnAgwBiRHGQGCHlCvMYankD31Em8FPd3gKU2clKfYso5BZON4TYaRdaCV2mFFJEp0XJhOqt51LzynW0qR8="
+        // let navigators = ['https://nav-us.ronghub.com']
 
 
         // 应用初始化以获取 RongIMLib 实例对象，请务必保证此过程只被执行一次,连接类型推荐使用comet
@@ -101,7 +105,7 @@
         function handelConnect() {
             im.connect({ token }).then(user => {
                 console.log('链接成功, 链接用户 id 为: ', user.id);
-                getConversationList()
+                // getConversationList()
             }).catch(error => {
                 console.log('链接失败: ', error.code, error.msg);
             });
