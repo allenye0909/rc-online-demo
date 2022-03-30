@@ -8,7 +8,7 @@
     <title>Document</title>
     <script src="./config.js"></script>
     <!-- 超级群 5.2.0 -->
-    <script src="https://cdn.ronghub.com/RongIMLib-5.2.0.prod.js"></script> 
+    <script src="https://cdn.ronghub.com/RongIMLib-5.2.0.prod.js"></script>
     <!-- <script src="./dist/RongIMLib-5.0.3.js"></script> -->
     <!-- <script src="./assets/js/RongIMLib-5.0.0.prod.js"></script> -->
     <script src="https://cdn.ronghub.com/RongEmoji-2.2.10.js"></script>
@@ -33,7 +33,7 @@
         // const token = "2v8tmW2mQLXfViA2C6p0Jm1hC0xv/+xhxFY4yoL9rhg=@vyzw.cn.rongnav.com;vyzw.cn.rongcfg.com"
         const { appkey, token, groupId, targetId } = Config
         // 应用初始化以获取 RongIMLib 实例对象，请务必保证此过程只被执行一次,连接类型推荐使用comet
-        RongIMLib.init({ appkey });
+        RongIMLib.init({ appkey, logLevel: 0 });
 
         // 添加事件监听
 
@@ -89,6 +89,22 @@
             const { conversation, messageUIdList, receivedUserId } = res;
             console.log(res)
             console.log("rrs 消息回执响应监听事件", conversation, messageUIdList, receivedUserId)
+        });
+
+        RongIMLib.addEventListener(Events.ULTRA_GROUP_ENABLE, (event) => {
+            console.log("ULTRA_GROUP_ENABLE", event);
+        });
+
+        RongIMLib.addEventListener(Events.ULTRA_GROUP_MESSAGE_EXPANSION_UPDATED, (event) => {
+            console.log("ULTRA_GROUP_MESSAGE_EXPANSION_UPDATED", event);
+        });
+
+        RongIMLib.addEventListener(Events.ULTRA_GROUP_MESSAGE_MODIFIED, (event) => {
+            console.log("ULTRA_GROUP_MESSAGE_MODIFIED", event);
+        });
+
+        RongIMLib.addEventListener(Events.ULTRA_GROUP_MESSAGE_RECALLED, (event) => {
+            console.log("ULTRA_GROUP_MESSAGE_RECALLED", event);
         });
 
         RongIMLib.connect(token).then((res) => {

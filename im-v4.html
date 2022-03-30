@@ -13,6 +13,10 @@
 <body>
     <button onclick="handelConnect()">connect</button>
     <button onclick="handelDisconnect()">disconnect</button>
+    <button onclick="handelJoinChatroom()">handelJoinChatroom</button>
+    <button onclick="handelGetChatroomInfo()">handelGetChatroomInfo</button>
+
+
     <script>
         // const appkey = "kj7swf8oks3n2"
         // const token = "JDFn+CWVmYPqh8l/V+KblyBc75H6uJlixl2+WYCTxdw=@az71.cn.rongnav.com;az71.cn.rongcfg.com"
@@ -123,6 +127,29 @@
             });
             conversation.read().then(function () {
                 console.log('清除未读数成功'); // im.watch conversation 将被触发
+            });
+        }
+
+        function handelJoinChatroom() {
+            var chatRoom = im.ChatRoom.get({
+                id: '1'
+            });
+
+            chatRoom.join({
+                count: 20 // 进入后, 自动拉取 20 条聊天室最新消息
+            }).then(function () {
+                console.log('加入聊天室成功');
+            });
+        }
+
+        function handelGetChatroomInfo() {
+            var chatRoom = im.ChatRoom.get({
+                id: '1'
+            });
+            chatRoom.getInfo({ count: 20, order: 1 }).then(function (result) {
+                var userCount = result.userCount;
+                var userInfos = result.userInfos;
+                console.log('获取聊天室信息成功', userCount, userInfos);
             });
         }
     </script>

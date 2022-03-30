@@ -18,8 +18,8 @@
     <button onclick="handelSendRRReq()">发送群消息后直接发送群响应回执请求</button>
     <script>
         // 一套私有云环境
-        // const appkey = "c9kqb33nzrp7j"
-        // const token = "XLCNS7YXSwBYKJ+RLfoRe3aLMKMsT9wNTOKoLq242/YvdcLMc3/hwjHL9Ls="
+        // const appkey = "pvxdm119nx7zr"
+        // const token = "UWygS6rc5h59f6iY+k39BR8DI45A/Xk7nWGntF3nazj3iQvSOWgBiYsyI0s="
         // const navi = "rtx.zunshe.net:1444"
 
         const { appkey, token, logLevel } = Config
@@ -31,7 +31,7 @@
         RongIMLib.RongIMClient.init(appkey, null, {
             navi: '', // 私有部署配置，公有云用户可忽略
             api: '', // 私有部署配置，公有云用户可忽略
-            logLevel: logLevel
+            // logLevel: 0
         });
 
 

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <script src="https://cdn.ronghub.com/RongIMLib-2.9.latest.js"></script>
+
+
+    <!-- ----------------私有云操作提示------------------ -->
+    <!-- 更换私有云appkey、token、SDK以及填写navi参数，做连接融云测试，并提供浏览器控制台日志截图。 -->
+    <!-- ----------------私有云操作提示------------------ -->
+
+
+    <script>
+        const appKey = 'kj7swf8oks5h2';
+        const token = "JIcZGRVYACFnRsqSIi3hm1DKxFEkcMcziWFSKBIw9eg=@af01.cn.rongnav.com;af01.cn.rongcfg.com";
+
+        const options = {
+            navi: '', // 私有部署配置，公有云用户可忽略
+            api: '', // 私有部署配置，公有云用户可忽略
+            logLevel: 0
+        }
+        RongIMLib.RongIMClient.init(appKey, null, options);
+
+
+        RongIMClient.connect(token, {
+            onSuccess: function (userId) {
+                console.log('连接成功, 用户 ID 为', userId);
+                // 连接已成功, 此时可通过 getConversationList 获取会话列表并展示
+            },
+            onTokenIncorrect: function () {
+                console.log('连接失败, 失败原因: token 无效');
+            },
+            onError: function (errorCode) {
+                console.log('连接失败, 失败原因: ', errorCode);
+            }
+        });
+
+        var params = {
+            // 接收到的消息
+            onReceived: function (message) {
+                console.info(message);
+            }
+        };
+        RongIMClient.setOnReceiveMessageListener(params);
+    </script>
+</body>
+
+</html>

@@ -27,6 +27,7 @@
     <button onclick="handelGetMediaAndPublishVideoAndAudio(2)">获取、发布音视频</button>
     <button onclick="handelGetMediaAndPublishVideo(1)">获取、发布视频</button>
     <button onclick="handelGetMediaAndPublishAudio(0)">获取、发布音频</button>
+    <button onclick="handelGetMediaAndPublishScreen()">获取、发布屏幕</button>
     <!-- /**
     * 媒体资源类型
     */
@@ -52,7 +53,7 @@
     <div id="pkbox"></div>
 
     <script>
-        const rtcClient = RongIMLib.installPlugin(rtcInstaller, { /*初始化参数请参考下方参数说明*/ })
+        const rtcClient = RongIMLib.installPlugin(rtcInstaller, { logLevel: 0/*初始化参数请参考下方参数说明*/ })
         let roomInstance;
         let roomPKHandler;
         let pkRoomInstance;
@@ -72,7 +73,9 @@
             //      */
             //     AUDIO = 1
             // }
-            const { code, room, userIds, tracks: remoteTracks } = await rtcClient.joinLivingRoom(roomId, 0)
+            // joinLivingRoom
+            const { code, room, userIds, tracks: remoteTracks } = await rtcClient.joinRTCRoom(roomId)
+            console.log("userIds:", userIds)
             // debugger
             // 若加入失败，则 room、userIds、tracks 值为 undefined
             if (code !== RCRTCCode.SUCCESS) {
@@ -93,6 +96,7 @@
                  * 当值为 true 时，说明本端收到被踢出房间通知
                  */
                 onKickOff(byServer) {
+                    console.log("onKickOff", byServer)
                 },
                 /**
                  * 接收到房间信令时回调，用户可通过房间实例的 `sendMessage(name, content)` 接口发送信令
@@ -175,7 +179,7 @@
                 }
             })
             // handelGetMediaAndPublishVideoAndAudio()
-            handelPKInit()
+            // handelPKInit()
         }
 
         async function handelGetMediaAndPublishVideoAndAudio() {
@@ -215,6 +219,40 @@
             }
         }
 
+        async function handelGetMediaAndPublishScreen() {
+
+
+            const { code, track } = await rtcClient.createScreenVideoTrack(tag = 'RongCloudRTC-screen')
+            console.log(code, track)
+            // public static EVENT_LOCAL_TRACK_END = 'local-track-end'
+            window.track = track;
+            track.on("local-track-end", (track) => {
+                // 取消发布屏幕共享流，room 为当前加入的房间实例
+                console.log("监听到了 取消屏幕流")
+                // room.unpublish([track])
+            })
+
+            // setTimeout(() => {
+            //     track.destroy()
+            // }, 5000);
+
+
+            if (code === RCRTCCode.SUCCESS) {
+                playVideo(track);
+                handelPublish(track)
+            }
+        }
+
+        function stopCapture(evt) {
+            // $$('video')[0].srcObject.getTracks().forEach(track => track.stop());
+            // $$('video')[0].srcObject = null
+            let tracks = videoElem.srcObject.getTracks();
+
+            tracks.forEach(track => track.stop());
+            videoElem.srcObject = null;
+        }
+
+
 
 
         async function handelPublish(tracks) {
@@ -247,7 +285,6 @@
 
             // 视频在对应的容器里播放
             if (track.isVideoTrack()) {
-                dom
                 const box = document.getElementById(dom || "box");
                 const video = document.createElement("video");
                 // video.autoplay = true;

@@ -6,9 +6,9 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    <script src="https://cdn.ronghub.com/RongIMLib-5.0.1.prod.js"></script>
-    <script src="https://cdn.ronghub.com/RCRTC-5.2.latest.js"></script>
-    <script src="https://cdn.ronghub.com/RCCall-5.0.latest.js"></script>
+    <script src="https://cdn.ronghub.com/RongIMLib-5.2.1.prod.js"></script>
+    <script src="https://cdn.ronghub.com/RCRTC-5.3.2.prod.js"></script>
+    <script src="https://cdn.ronghub.com/RCCall-5.0.7.prod.js"></script>
     <script src="./utils.js"></script>
     <script src="./config.js"></script>
     <style>
@@ -95,7 +95,8 @@
                 /**
                  * 被动收到邀请 （收到一个远端发起的新会话）, 会产生一个新的 session 对象 （必填）
                  */
-                onSession(session) {
+                onSession(session, extra) {
+                    console.log(extra)
                     console.log('收到一个远端发起的新会话:', session)
                     _session = session
                     /** 
@@ -142,6 +143,7 @@
                          * @param session 当前的 session 对象
                          */
                         onTrackReady(track, session) {
+                            console.log("onTrackReady registerSessionListener", track)
                             playVideo(track)
                         },
                         // 用户状态变更
@@ -219,6 +221,7 @@
                 targetId: targetId,
                 mediaType,
                 constraints: constraints,
+                extra: ">>>>>>>>>>>>",
                 listener: {
 
                     /**
@@ -260,6 +263,7 @@
                      * @param session 当前的 session 对象
                      */
                     onTrackReady(track, session) {
+                        console.log("onTrackReady caller.call", track)
                         playVideo(track)
                     },
 
