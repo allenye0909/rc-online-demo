@@ -54,7 +54,7 @@
         function disconnect() {
             RongIMClient.getInstance().disconnect().then(function (res) {
                 console.log("then", res)
-            }).catch(function (res) {
+            }).catch(function (err) {
                 console.log("catch:", err)
             })
         }
