@@ -52,7 +52,11 @@
         RongIMClient.setOnReceiveMessageListener(params);
 
         function disconnect() {
-            RongIMClient.getInstance().disconnect().then(res => console.log("then", res)).catch(err => console.log("catch:", err))
+            RongIMClient.getInstance().disconnect().then(function (res) {
+                console.log("then", res)
+            }).catch(function (res) {
+                console.log("catch:", err)
+            })
         }
     </script>
 </body>
