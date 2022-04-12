@@ -8,6 +8,7 @@
     <title>Document</title>
     <script src="./config.js"></script>
     <script src="https://cdn.ronghub.com/RongIMLib-4.4.5.prod.js"></script>
+    <!-- <script src="https://cdn.ronghub.com/RongIMLib-4.6.1.prod.js"></script> -->
 </head>
 
 <body>
@@ -18,8 +19,9 @@
 
 
     <script>
-        // const appkey = "kj7swf8oks3n2"
-        // const token = "JDFn+CWVmYPqh8l/V+KblyBc75H6uJlixl2+WYCTxdw=@az71.cn.rongnav.com;az71.cn.rongcfg.com"
+        // const appkey = "6tnym1br6h8b7"
+        // const token = "g6bMKjK/OZ1RSrDsEX+T1kl3/UUpqIml1/BXinRR4OE=@1cgz.cn.rongnav.com;1cgz.cn.rongcfg.com"
+        // const logLevel = 0
 
         let { appkey, token, logLevel } = Config
         console.log("logLevel:", logLevel)
@@ -95,6 +97,7 @@
             }
         });
 
+        im.unwatch()
         function getConversationList() {
             im.Conversation.getList({
                 count: 30,
@@ -109,7 +112,7 @@
         function handelConnect() {
             im.connect({ token }).then(user => {
                 console.log('链接成功, 链接用户 id 为: ', user.id);
-                // getConversationList()
+                getConversationList()
             }).catch(error => {
                 console.log('链接失败: ', error.code, error.msg);
             });

@@ -17,7 +17,8 @@
 <body>
     <p>
     <p>文件上传后，可以在全局获取 file</p>
-    <input type="file" name="" id="file" onchange="handelChange(event)">
+    <input type="file" name="" id="file" class="banner-upload" onchange="handelChange(event)">
+    <button onclick="handelClick()">handelClick</button>
     </p>
     <div>
         <button onclick="handelSend(1)">发送单聊消息</button>
@@ -33,7 +34,7 @@
         // const token = "2v8tmW2mQLXfViA2C6p0Jm1hC0xv/+xhxFY4yoL9rhg=@vyzw.cn.rongnav.com;vyzw.cn.rongcfg.com"
         const { appkey, token, groupId, targetId } = Config
         // 应用初始化以获取 RongIMLib 实例对象，请务必保证此过程只被执行一次,连接类型推荐使用comet
-        RongIMLib.init({ appkey, logLevel: 0 });
+        RongIMLib.init({ appkey, logLevel:0 });
 
         // 添加事件监听
 
@@ -44,6 +45,7 @@
 
         RongIMLib.addEventListener(Events.CONNECTED, function () {
             console.log("已经链接到服务器");
+            handelGetConversationList()
         });
 
         RongIMLib.addEventListener(Events.MESSAGES, function (messages) {
@@ -75,6 +77,16 @@
 
         RongIMLib.addEventListener(Events.CHATROOM, (event) => {
             console.warn("chatroom", event);
+            // 新增用户加入、退出聊天室通知能力，需要客户开通后支持，可提交工单申请开通
+            // const o = {
+            //     userChange: {
+            //         users: {
+            //             [senderUserId]: 1:join 0:quit
+            //             [senderUserId]: message.messageType === 'RC:ChrmQuitNtf' ? ChatroomUserChangeType.QUIT : ChatroomUserChangeType.JOIN
+            //         },
+            //         chatroomId: message.targetId
+            //     }
+            // }
         });
 
         RongIMLib.addEventListener(Events.CONVERSATION, (event) => {
@@ -113,6 +125,7 @@
             }
         })
 
+        const randomString = function (e, t) { var r = []; for (e = e || 16, t = t || "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"; e--;)r.push(t[Math.floor(Math.random() * t.length)]); return r.join("") }
 
         function handelChange(params) {
             console.log(params)
@@ -183,10 +196,30 @@
             })
         }
 
+        function handelGetConversationList() {
+            const startTime = 0;
+            const count = 10;
+            const order = 0;
 
-        // RongIMLib.RongIMEmoji.init();
-        // console.log(RongIMLib.RongIMEmoji.list)
+            RongIMLib.getConversationList({
+                count: count,
+                startTime: startTime,
+                order: order
+            }).then(res => {
+                if (res.code === 0) {
+                    console.log(res.code, res.data)
+                } else {
+                    console.log(res.code, res.msg)
+                }
+            })
+        }
 
+
+        function handelClick() {
+            document
+                .querySelector(".banner-upload")
+                .click()
+        }
     </script>
 </body>
 

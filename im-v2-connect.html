@@ -9,6 +9,7 @@
 </head>
 
 <body>
+    <button onclick="disconnect()">disconnect</button>
     <script src="https://cdn.ronghub.com/RongIMLib-2.9.latest.js"></script>
 
 
@@ -18,8 +19,8 @@
 
 
     <script>
-        const appKey = 'kj7swf8oks5h2';
-        const token = "JIcZGRVYACFnRsqSIi3hm1DKxFEkcMcziWFSKBIw9eg=@af01.cn.rongnav.com;af01.cn.rongcfg.com";
+        const appKey = '8luwapkv84k9l';
+        const token = "RAK3kB3PfxjrhcJHnANEr9xGTTY1OyqtejKm1UC9Lc0=@ak0f.cn.rongnav.com;ak0f.cn.rongcfg.com";
 
         const options = {
             navi: '', // 私有部署配置，公有云用户可忽略
@@ -49,6 +50,10 @@
             }
         };
         RongIMClient.setOnReceiveMessageListener(params);
+
+        function disconnect() {
+            RongIMClient.getInstance().disconnect();
+        }
     </script>
 </body>
 

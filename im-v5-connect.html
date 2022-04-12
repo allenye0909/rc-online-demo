@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <script src="https://cdn.ronghub.com/RongIMLib-5.0.0.prod.js"></script>
+    <!-- <script src="./dist/RongIMLib-5.0.2.js"></script> -->
+
+    <button onclick="disconnect()">disconnect</button>
+
+
+    <!-- ----------------私有云操作提示------------------ -->
+    <!-- 更换私有云appkey、token、SDK以及填写navi参数，做连接融云测试，并提供浏览器控制台日志截图。 -->
+    <!-- ----------------私有云操作提示------------------ -->
+
+
+    <script>
+        const appkey = '8luwapkv84k9l';
+        const token = "RAK3kB3PfxjrhcJHnANEr9xGTTY1OyqtejKm1UC9Lc0=@ak0f.cn.rongnav.com;ak0f.cn.rongcfg.com";
+
+        RongIMLib.init({ appkey: appkey });
+        const Events = RongIMLib.Events
+
+
+
+        // 添加具体事件监听器
+        RongIMLib.addEventListener(Events.MESSAGES, function (messages) {
+            console.log("Events.MESSAGES", messages)
+        })
+        RongIMLib.addEventListener(Events.CONNECTING, function (messages) {
+            console.log('正在链接...')
+        })
+
+        /**
+         * 链接到服务器会触发这个事件
+         */
+        RongIMLib.addEventListener(Events.CONNECTED, function (messages) {
+            console.log('连接成功')
+        })
+
+        /**
+         * 手动调用 disconnect 方法或者用户被踢下线 会触发这个事件
+         */
+        RongIMLib.addEventListener(Events.DISCONNECT, function (messages) {
+            console.log('连接中断，需要业务层进行重连处理')
+        })
+
+        /**
+         * 链接出问题时，内部进行重新链接，会出发这个事件
+         */
+        RongIMLib.addEventListener(Events.SUSPEND, function (messages) {
+            console.log('链接中断，SDK 会尝试重连，业务层无需关心')
+        })
+
+        RongIMLib.connect(token).then(function (res) {
+            if (res.code === 0) {
+                console.log("user:", res.data.userId)
+            }
+        })
+
+        function disconnect() {
+            RongIMLib.disconnect().then(function (messages) {
+                console.log('成功断开')
+            })
+        }
+
+
+    </script>
+</body>
+
+</html>
