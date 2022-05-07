@@ -40,12 +40,14 @@
 	会话类型切换：const conversationType = location.search.includes("conversationType") === 3 ? 3 : 1;
 	资源类型切换：const mediaType = Utils.getQueryVariable("type") == 1 ? RongCallLib.VoIPMediaType.MEDIA_AUDIO : RongCallLib.VoIPMediaType.MEDIA_VEDIO
 	日志类型切换：logLevel: location.search.includes("logLevel") ? 0 : null
+	测试群组邀请：?allen&conversationType=3
 		</pre>
 		<p>type:1 为音频呼叫；2 为 音视频呼叫</p>
 		<span>appkey：</span><input id="appkey" type="text" value="" placeholder="请输入 appkey" autocomplete="off">
 		<span>token：</span><input id="token" type="text" value="" placeholder="请输入 token" autocomplete="off">
 		<span>userId：</span><input id="userId" type="text" disabled value="">
 		<span>targetId：</span><input id="targetId" type="text" value="">
+
 		<br>
 		<input type="button" value="连接" onclick="handelConnect()">
 		<input type="button" value="拨打" onclick="handelCall()">
@@ -54,15 +56,21 @@
 		<input type="button" value="mute" onclick="mute()">
 		<input type="button" value="unmute" onclick="unmute()">
 		<input type="button" value="userAgent" onclick="alert(navigator.userAgent)">
+
+		<br>
+		<span>inviteUserIds：</span><input id="inviteUserIds" type="text" value="test">
+		<input type="button" value="邀请" onclick="invite()">
+        <input type="button" value="userAgent" onclick="alert(navigator.userAgent)">
 	</div>
 	<div id="box"></div>
 	<script>
 		let { appkey, token, targetId, userId, logLevel, isHaveUser, inviteId, groupId } = Config;
 		let rongCallLib, _message;
-		const conversationType = location.search.includes("conversationType") === 3 ? 3 : 1;
+		const conversationType = location.search.includes("conversationType") ? 3 : 1;
 		console.log("conversationType->", conversationType)
 		const mediaType = Utils.getQueryVariable("type") == 1 ? RongCallLib.VoIPMediaType.MEDIA_AUDIO : RongCallLib.VoIPMediaType.MEDIA_VEDIO
 		isHaveUser && handelConnect();
+		let joinNumber = 0
 		function handelConnect() {
 			checkValue()
 			const im = RongIMLib.init({ appkey })
@@ -122,6 +130,7 @@
 					video.x5PlaysInline = true;
 					video.webkitPlaysInline = true;
 					// video.play()
+					joinNumber ++
 				} else if (type === 'removed') {
 					// 删除对应音视频节点
 					// var video = result.data;
@@ -130,11 +139,12 @@
 					// video.x5PlaysInline = true;
 					// video.webkitPlaysInline = true;
 					// video.play()
-
-					removeVideoEl()
+					joinNumber --
+					removeVideoEl(result)
 				} else if (type == 'leave') {
 					// 音视频结束, 清空所有音视频 UI
 					removeVideoEl()
+					joinNumber = 0
 				}
 			};
 			rongCallLib.videoWatch(videoWatcher);
@@ -219,6 +229,26 @@
 			rongCallLib.unmute();
 		}
 
+		function invite() {
+			if (conversationType !== 3) {
+				return alert("只有群组才能邀请")
+			}
+			var inviteUserIds = ['test', 'user1', 'user2'];
+			var params = {
+				conversationType: RongIMLib.CONVERSATION_TYPE.GROUP,
+				targetId: groupId,
+				inviteUserIds: inviteUserIds,
+				mediaType: mediaType
+			};
+			console.log(params)
+			rongCallLib.invite(params, function (error) {
+				if (error) {
+					console.error('邀请通话失败', error);
+				}
+			});
+			console.log("发起邀请： ", inviteUserIds)
+		}
+
 		function checkValue() {
 
 			function getValue(id) {
@@ -247,9 +277,15 @@
 		function toast(msg, time = 1000) {
 			Utils.toast(msg, time)
 		}
-		const removeVideoEl = () => {
+		const removeVideoEl = (res) => {
 			const videoWrapEl = document.getElementById('box');
-			videoWrapEl.innerHTML = '';
+			if (!res) {
+				videoWrapEl.innerHTML = '';
+				return;
+			}
+
+			const removeNode = document.getElementById(res.userId);
+			videoWrapEl.removeChild(removeNode);
 		};
 		var log = (tag, ...args) => {
 			console.log(tag, new Date().toISOString(), ...args)
