@@ -7,21 +7,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <script src="./config.js"></script>
-    <script src="https://cdn.ronghub.com/RongIMLib-4.4.5.prod.js"></script>
-    <!-- <script src="https://cdn.ronghub.com/RongIMLib-4.6.1.prod.js"></script> -->
+    <!-- <script src="https://cdn.ronghub.com/RongIMLib-4.4.5.prod.js"></script> -->
+    <script src="https://cdn.ronghub.com/RongIMLib-4.3.0.prod.js"></script>
 </head>
 
 <body>
+    <button onclick="unwatch()">unwatch</button>
     <button onclick="handelConnect()">connect</button>
     <button onclick="handelDisconnect()">disconnect</button>
     <button onclick="handelJoinChatroom()">handelJoinChatroom</button>
     <button onclick="handelGetChatroomInfo()">handelGetChatroomInfo</button>
+    <button onclick="setExpansion()">setExpansion</button>
+
+
 
 
     <script>
-        // const appkey = "6tnym1br6h8b7"
-        // const token = "g6bMKjK/OZ1RSrDsEX+T1kl3/UUpqIml1/BXinRR4OE=@1cgz.cn.rongnav.com;1cgz.cn.rongcfg.com"
-        // const logLevel = 0
+        // const appkey = "c9kqb3rdcodaj"
+        // const token = "pabXfSPgyVXEVAmEI+XbYtnULzRbMeqrzZ5Zu83123s=@nk4a.cn.rongnav.com;nk4a.cn.rongcfg.com"
+        // const logLevel = 1
 
         let { appkey, token, logLevel } = Config
         console.log("logLevel:", logLevel)
@@ -77,6 +81,7 @@
                 console.log("监听聊天室 KV 数据变更", event)
             },
             expansion(event) {
+                console.log("watch expansion", event)
                 /**
                  * 更新的消息拓展数据
                  * @example {
@@ -96,23 +101,33 @@
                 console.log("expansion", event, updatedExpansion, deletedExpansion)
             }
         });
-
-        im.unwatch()
-        function getConversationList() {
+        function unwatch() {
+            im.unwatch()
+            console.log("取消watch监听！")
+        }
+        function getConversationList(startTime) {
             im.Conversation.getList({
-                count: 30,
-                startTime: 0,
+                count: 1000,
+                startTime,
                 order: 0
             }).then(list => {
+
+                // setTimeout(() => {
+                //     console.log(i)
                 console.log('获取会话列表成功', list);
-                conversationList = list
+                //     conversationList = [...conversationList, ...list]
+                //     list.length && getConversationList(list[0].latestMessage.sentTime)
+                //     // i++
+                // }, 200);
             });
         }
+
+
 
         function handelConnect() {
             im.connect({ token }).then(user => {
                 console.log('链接成功, 链接用户 id 为: ', user.id);
-                getConversationList()
+                getConversationList(0)
             }).catch(error => {
                 console.log('链接失败: ', error.code, error.msg);
             });

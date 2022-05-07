@@ -8,7 +8,8 @@
     <title>Document</title>
     <script src="./config.js"></script>
     <!-- 超级群 5.2.0 -->
-    <script src="https://cdn.ronghub.com/RongIMLib-5.2.0.prod.js"></script>
+    <!-- <script src="https://cdn.ronghub.com/RongIMLib-5.2.0.prod.js"></script> -->
+    <script src="https://cdn.ronghub.com/RongIMLib-5.2.4.prod.js"></script>
     <!-- <script src="./dist/RongIMLib-5.0.3.js"></script> -->
     <!-- <script src="./assets/js/RongIMLib-5.0.0.prod.js"></script> -->
     <script src="https://cdn.ronghub.com/RongEmoji-2.2.10.js"></script>
@@ -32,9 +33,9 @@
     <script>
         // const appkey = "8brlm7uf8ozt3"
         // const token = "2v8tmW2mQLXfViA2C6p0Jm1hC0xv/+xhxFY4yoL9rhg=@vyzw.cn.rongnav.com;vyzw.cn.rongcfg.com"
-        const { appkey, token, groupId, targetId } = Config
+        const { appkey, token, groupId, targetId, logLevel } = Config
         // 应用初始化以获取 RongIMLib 实例对象，请务必保证此过程只被执行一次,连接类型推荐使用comet
-        RongIMLib.init({ appkey, logLevel:0 });
+        RongIMLib.init({ appkey, logLevel });
 
         // 添加事件监听
 
@@ -134,15 +135,21 @@
 
         function handelSendAndUpdateExpansion() {
             const message = new RongIMLib.TextMessage({ content: '测试发送扩展消息' })
+            const str = 'value: measurement; dimensions; size; magnitude; measure; admeasurement; bigness; fitting:'
             // 发送消息
-            RongIMLib.sendMessage({ conversationType: 3, targetId: 'group1' }, message, { canIncludeExpansion: true, expansion: { key: 'value' } }).then(res => {
+            const expansion = {
+                emoji_action_list: "[{\"emojiStr\":\"😎\",\"userIds\":[10003]},{\"emojiStr\":\"😎\",\"userIds\":[10003]}]",
+                local_message_id: "1650793585441"
+            }
+            // : { key: str } 
+            RongIMLib.sendMessage({ conversationType: 3, targetId: 'group1' }, message, { canIncludeExpansion: true, expansion}).then(res => {
                 console.log("发送消息成功->", res)
                 let conversation = {
                     conversationType: res.data.conversationType || res.data.type,
                     targetId: res.data.targetId
                 }
                 // 更新扩展
-                RongIMLib.updateMessageExpansion({ key1: 'val1', key2: 'val2', ...conversation }, res.data).then(res => {
+                RongIMLib.updateMessageExpansion({ key1: 'val1', key2: str, ...conversation }, res.data).then(res => {
                     if (res.code === 0) {
                         console.log(res, '更新成功')
                     } else {

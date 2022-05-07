@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<!-- IMLib SDK -->
+<script src="https://cdn.ronghub.com/RongIMLib-4.4.8.prod.js"></script>
+<!-- RTCLib v5 -->
+<!-- 5.1.8 修复在 IOS 上不能播放视频问题 -->
+<!-- <script src="https://cdn.ronghub.com/RCRTC-5.1.0.prod.js"></script> -->
+<script src="https://cdn.ronghub.com/RCRTC-5.1.1.prod.js"></script>
+<!-- RCRTCAdapter -->
+<script src="https://cdn.ronghub.com/RCRTCAdapter-1.0.7.prod.js"></script>
+<!-- CallLib SDK -->
+<script src="https://cdn.ronghub.com/RongCallLib.3.2.1.min.js"></script>
+<!-- VUE -->
+<!-- <script src="https://unpkg.com/vue/dist/vue.js"></script> -->
+
+<script src="https://unpkg.com/vconsole/dist/vconsole.min.js"></script>
+<script src="./config.js"></script>
+<script>
+    // VConsole will be exported to `window.VConsole` by default.
+    if ((navigator.userAgent.match(/(iPhone|iPod|Android|ios|iOS|iPad|Backberry|WebOS|Symbian|Windows Phone|Phone)/i))) {
+        new window.VConsole();
+    }
+</script>
+
+
+<body>
+    <div>
+        <h3>使用方法：</h3>
+        <pre>
+	会话类型切换：const conversationType = location.search.includes("conversationType") === 3 ? 3 : 1;
+	资源类型切换：const mediaType = getQueryVariable("type") == 1 ? RongCallLib.VoIPMediaType.MEDIA_AUDIO : RongCallLib.VoIPMediaType.MEDIA_VEDIO
+		</pre>
+        <p>type:1 为音频呼叫；2 为 音视频呼叫</p>
+        <span>appkey：</span><input id="appkey" type="text" value="" placeholder="请输入 appkey" autocomplete="off">
+        <span>token：</span><input id="token" type="text" value="" placeholder="请输入 token" autocomplete="off">
+        <span>userId：</span><input id="userId" type="text" disabled value="">
+        <span>targetId：</span><input id="targetId" type="text" value="">
+
+        <br>
+        <input type="button" value="连接" onclick="handelConnect()">
+        <input type="button" value="拨打" onclick="handelCall()">
+        <input type="button" value="接听" onclick="handelAccept()">
+        <input type="button" value="挂断" onclick="handelHungup()">
+        <input type="button" value="mute" onclick="mute()">
+        <input type="button" value="unmute" onclick="unmute()">
+        <input type="button" value="userAgent" onclick="alert(navigator.userAgent)">
+
+
+        <br>
+        <span>inviteUserIds：</span><input id="inviteUserIds" type="text" value="test">
+        <input type="button" value="邀请" onclick="invite()">
+        <input type="button" value="查看群内人数" onclick="alert(joinNumber)">
+    </div>
+    <div id="box"></div>
+    <script>
+        let { appkey, token, targetId, userId, logLevel, inviteId, groupId } = Config;
+        let rongCallLib, _message;
+        const conversationType = location.search.includes("conversationType") ? 3 : 1;
+        console.log("conversationType->", conversationType)
+        const mediaType = getQueryVariable("type") == 1 ? RongCallLib.VoIPMediaType.MEDIA_AUDIO : RongCallLib.VoIPMediaType.MEDIA_VEDIO
+        var isHaveUser = isHaveUser || false
+        let joinNumber = 0
+        function handelConnect() {
+            checkValue()
+            const im = RongIMLib.init({ appkey })
+            // 添加事件监听器
+            im.watch({
+                // 连接状态监听
+                status(evt) {
+                    console.log('连接状态码:', evt.status);
+                    console.log(`连接状态码--->${evt.status}`)
+                },
+                // 消息监听
+                message(evt) {
+                    console.log('收到新消息:', evt.message);
+                }
+            })
+
+            // RCRTC 是 RTCLib v5 的顶级变量定义
+            const rtcClient = im.install(RCRTC.installer)
+            // const rtcClient = im.install(RCRTC.installer, {
+            // 	sdpSemantics: 'plan-b'
+            // })
+
+            // RongCallLib 为 CallLib v3 的顶级变量定义
+            im.install(RongCallLib.installer)
+
+
+            var config = {
+                timeout: 20000,
+                RongIMLib: RongIMLib,
+                RongRTC: rtcClient,
+                RongRTCAdapter: RCRTCAdapter
+            };
+            rongCallLib = RongCallLib.init(config);
+
+
+
+            //token 可从开发者后台获取 或 Server API
+            im.connect({ token }).then(user => {
+                console.log('链接成功, 链接用户 id 为: ', user.id);
+                document.getElementById('userId').value = user.id
+                console.log(`链接成功,id: ${user.id}`)
+            }).catch(error => {
+                console.log(`链接失败: ${error.code}`)
+                console.log('链接失败: ', error.code, error.msg);
+            });
+
+
+            var videoWatcher = function (result) {
+                var type = result.type;
+                console.log("videoWatch type", type, result)
+                var boxEl = document.getElementById('box');
+                if (type === 'added') {
+                    // 添加音视频节点
+                    var video = result.data;
+                    boxEl.appendChild(video);
+                    video.playsInline = true;
+                    video.x5PlaysInline = true;
+                    video.webkitPlaysInline = true;
+                    // video.play()
+                    joinNumber++
+                } else if (type === 'removed') {
+                    // 删除对应音视频节点
+                    // var video = result.data;
+                    // boxEl.removeChild(video);
+                    // video.playsInline = true;
+                    // video.x5PlaysInline = true;
+                    // video.webkitPlaysInline = true;
+                    // video.play()
+                    joinNumber--
+                    removeVideoEl(result)
+                } else if (type == 'leave') {
+                    // 音视频结束, 清空所有音视频 UI
+                    removeVideoEl()
+                    joinNumber = 0
+                }
+            };
+            rongCallLib.videoWatch(videoWatcher);
+
+
+
+            var commandWatcher = function (message) {
+                _message = message
+                // 根据消息类型做对应处理
+                var messageType = message.messageType;
+                log("commandWatch->", messageType, "->", message)
+                toast(messageType)
+            };
+            rongCallLib.commandWatch(commandWatcher);
+        }
+
+
+        function handelCall() {
+            checkValue()
+            var params = {
+                conversationType,
+                targetId: conversationType === 3 ? groupId : targetId,
+                // inviteUserIds	Array	被邀请人 ID, 最多支持 7 人. 单聊时, 只填入 targetId 即可
+                inviteUserIds: conversationType === 3 ? [inviteId, targetId] : [targetId],
+                mediaType,
+                extra: {
+                    name: "扩展字段"
+                }
+            };
+            console.log(params)
+            rongCallLib.call(params, function (error) {
+                if (error) {
+                    console.error('发起通话失败', error);
+                    toast("发起通话失败")
+                } else {
+                    console.log("发起通话成功！")
+                    toast("发起通话成功！")
+                }
+            });
+        }
+
+
+        function handelAccept() {
+            // params 中的 message 来自 rongCallLib.commandWatch 监听中收到的 InviteMessage。
+            var params = {
+                conversationType: _message.conversationType,
+                targetId: _message.targetId,
+                mediaType
+            };
+            rongCallLib.accept(params, function (error) {
+                if (error) {
+                    console.error('接听通话失败', error);
+                    toast("接听通话失败")
+                } else {
+                    toast("接听成功")
+                    console.log("接听成功")
+                }
+            });
+        }
+
+        function handelHungup() {
+            var params = {
+                conversationType,
+                targetId: conversationType === 3 ? groupId : targetId
+            };
+            rongCallLib.hungup(params, function (error) {
+                if (error) {
+                    console.error('挂断通话失败', error);
+                    toast("挂断通话失败")
+                } else {
+                    toast("挂断成功！")
+                    console.log("挂断成功！")
+                }
+            });
+        }
+
+        function mute() {
+            rongCallLib.mute();
+        }
+
+        function unmute() {
+            rongCallLib.unmute();
+        }
+
+        function invite() {
+            if (conversationType !== 3) {
+                return alert("只有群组才能邀请")
+            }
+            var inviteUserIds = ['test', 'user1', 'user2'];
+            var params = {
+                conversationType: RongIMLib.CONVERSATION_TYPE.GROUP,
+                targetId: groupId,
+                inviteUserIds: inviteUserIds,
+                mediaType: mediaType
+            };
+            console.log(params)
+            rongCallLib.invite(params, function (error) {
+                if (error) {
+                    console.error('邀请通话失败', error);
+                }
+            });
+            console.log("发起邀请： ", inviteUserIds)
+        }
+
+        function checkValue() {
+
+            function getValue(id) {
+                return document.getElementById(id).value
+            }
+            function setValue(id, value) {
+                document.getElementById(id).value = value
+            }
+
+            if (isHaveUser) {
+                appkey = getValue("appkey") || appkey
+                token = getValue("token") || token
+                userId = getValue("userId") || userId
+                targetId = getValue("targetId") || targetId
+
+                setValue("appkey", appkey)
+                setValue("token", token)
+                setValue("targetId", targetId)
+            } else {
+                appkey = getValue("appkey")
+                token = getValue("token")
+                targetId = getValue("targetId")
+            }
+            console.log(appkey, token, userId, targetId)
+        }
+        const removeVideoEl = (res) => {
+            const videoWrapEl = document.getElementById('box');
+            if (!res) {
+                videoWrapEl.innerHTML = '';
+                return;
+            }
+
+            const removeNode = document.getElementById(res.userId);
+            videoWrapEl.removeChild(removeNode);
+        };
+        var log = (tag, ...args) => {
+            console.log(tag, new Date().toISOString(), ...args)
+        }
+
+        function getQueryVariable(variable) {
+            var query = window.location.search.substring(1);
+            var vars = query.split("&");
+            for (var i = 0; i < vars.length; i++) {
+                var pair = vars[i].split("=");
+                if (pair[0] == variable) { return pair[1]; }
+            }
+            return (false);
+        }
+    </script>
+</body>
+
+</html>

@@ -7,8 +7,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- <script src="https://cdn.ronghub.com/RongIMLib-5.1.0.prod.js"></script> -->
     <script src="https://cdn.ronghub.com/RongIMLib-5.1.2.prod.js"></script>
-    <script src="https://cdn.ronghub.com/RCRTC-5.3.latest.js"></script>
-    <!-- <script src="./dist/RCRTC-5.3.2.dev.js"></script> -->
+    <!-- <script src="https://cdn.ronghub.com/RCRTC-5.3.8.prod.js"></script> -->
+    <script src="./dist/RCRTC-5.3.8-alpha.1.prod.js"></script>
     <script src="./config.js"></script>
     <script src="./assets/js/im-v5.js"></script>
     <title>Document</title>
@@ -16,18 +16,12 @@
 
 <body>
     <pre style="margin-left: -56px">
-        const roomId = location.search.includes("pk") ? "pkRoomId" : "roomId"
-        const inviteeRoomId = roomId === "pkRoomId" ? "roomId" : "pkRoomId"
+
     </pre>
 
     <button onclick="handelJoinLivingRoom()">加入房间</button>
-    <button onclick="handelInvitePK()">发起连麦邀请</button>
-    <button onclick="handelUnInvitePK()">取消连麦邀请</button>
-    <button onclick="handelAcceptPK()">响应连麦请求</button>
     <button onclick="handelGetMediaAndPublishVideoAndAudio(2)">获取、发布音视频</button>
-    <button onclick="handelGetMediaAndPublishVideo(1)">获取、发布视频</button>
-    <button onclick="handelGetMediaAndPublishAudio(0)">获取、发布音频</button>
-    <button onclick="handelGetMediaAndPublishScreen()">获取、发布屏幕</button>
+
     <!-- /**
     * 媒体资源类型
     */
@@ -53,7 +47,7 @@
     <div id="pkbox"></div>
 
     <script>
-        const rtcClient = RongIMLib.installPlugin(rtcInstaller, { logLevel: 0/*初始化参数请参考下方参数说明*/ })
+        const rtcClient = RongIMLib.installPlugin(rtcInstaller, { logLevel/*初始化参数请参考下方参数说明*/ })
         let roomInstance;
         let roomPKHandler;
         let pkRoomInstance;
@@ -61,6 +55,8 @@
         const inviteeRoomId = roomId === "pkRoomId" ? "roomId" : "pkRoomId"
         const inviteeUserId = targetId;
         var pkInfo;
+
+
 
         async function handelJoinLivingRoom() {
             // declare enum RCLivingType {
@@ -96,7 +92,7 @@
                  * 当值为 true 时，说明本端收到被踢出房间通知
                  */
                 onKickOff(byServer) {
-                    console.log("onKickOff", byServer)
+                    console.log("onKickOff byServer----------------------------------------------------", byServer)
                 },
                 /**
                  * 接收到房间信令时回调，用户可通过房间实例的 `sendMessage(name, content)` 接口发送信令
@@ -179,7 +175,7 @@
                 }
             })
             // handelGetMediaAndPublishVideoAndAudio()
-            handelGetMediaAndPublishVideoAndAudio()
+            // handelGetMediaAndPublishVideoAndAudio()
             // handelPKInit()
         }
 
@@ -302,232 +298,6 @@
             }
         }
 
-        function handelPKInit() {
-            // room 为主播加入各自直播间后，得到的直播房间 room 实例
-
-            // 获取跨房间连麦功能处理模块
-            roomPKHandler = roomInstance.getRoomPKHandler().roomPKHandler;
-            // 注册跨房间连麦相关事件监听
-            roomPKHandler.registerRoomPKEventListener({
-                /**
-                 * 收到连麦邀请，此时可调 roomPKHandler.responseJoinOtherRoom 响应连麦
-                 */
-                onRequestJoinOtherRoom(info) {
-                    console.log("收到连麦邀请", info);
-                    pkInfo = info;
-                },
-                /**
-                 * 收到连麦邀请已被取消
-                 */
-                onCancelRequestOtherRoom(info) {
-                    console.log("收到连麦邀请已被取消", info)
-                },
-                /**
-                 * 收到被邀请方应答，数据中包含对方是否同意请求
-                 * 如果对方同意连麦，此时可调 roomPKHandler.joinOtherRoom 加入对方房间
-                 */
-                onResponseJoinOtherRoom(info) {
-                    console.log("收到被邀请方应答", info)
-                    pkInfo = info;
-                    setTimeout(() => {
-                        handelJoinPKRoom()
-                    }, 1000);
-                },
-                /**
-                 * 收到连麦结束通知
-                 * 连麦结束时，plugin-rtc 内部会退出副房间，业务层只需做 UI 处理
-                 */
-                onFinishOtherRoom(info) {
-                    console.log("收到连麦结束通知", info)
-                }
-            })
-        }
-
-        async function handelInvitePK() {
-            /**
-             * 发起跨房间连麦请求
-             * @param inviteeRoomId 被邀请者所处的房间 roomId
-             * @param inviteeUserId 被邀请者 userId
-             * @param options.autoMix 是否要把邀请者发布的资源，合并到被邀请者房间内的 MCU 流中
-             * @param options.extra 附加信息，可随邀请连麦消息携带给被邀请者
-             */
-            var inviteeUserId = targetId,
-                options = {
-                    extra: userId + "的邀请"
-                }
-            const { code } = await roomPKHandler.requestJoinOtherRoom(inviteeRoomId, inviteeUserId, options)
-            if (code === RCRTCCode.SUCCESS) {
-                console.log('发送连麦邀请成功');
-            } else {
-                console.log("发送连麦邀请失败", code)
-            }
-        }
-
-        async function handelUnInvitePK() {
-            /**
-             * 取消跨房间连麦请求
-             * @param inviteeRoomId 被邀请者所处的房间 roomId
-             * @param inviteeUserId 被邀请者 userId
-             * @param extra 附加信息，可随取消邀请连麦消息携带给被邀请者
-             */
-            const extra = userId + "暂时有事儿，稍后在连麦"
-            const { code } = await roomPKHandler.cancelRequestJoinOtherRoom(inviteeRoomId, inviteeUserId, extra)
-            if (code === RCRTCCode.SUCCESS) {
-                console.log('发送取消连麦成功');
-            }
-        }
-
-        async function handelAcceptPK() {
-            /**
-             * 响应跨房间连麦请求
-             * @param inviterRoomId 邀请者所处的房间 roomId
-             * @param inviterUserId 邀请者 userId
-             * @param agree 是否同意连麦
-             * @param options.autoMix 是否要把被邀请者发布的资源，合并到邀请者房间内的 MCU 流中
-             * @param options.extra 附加信息，可随响应连麦消息携带给邀请者
-             */
-            var inviterRoomId = pkInfo.inviterRoomId;
-            var inviterUserId = pkInfo.inviterUserId;
-            var agree = true;
-            var options = {
-                autoMix: true,
-                extra: userId + "-agree" + agree
-            };
-
-            console.log(pkInfo)
-            const { code } = await roomPKHandler.responseJoinOtherRoom(inviterRoomId, inviterUserId, agree, options)
-            console.log(code)
-            if (code === RCRTCCode.SUCCESS) {
-                console.log('发送应答连麦成功');
-            } else {
-                console.log("发送应答连麦失败", code)
-            }
-
-            setTimeout(() => {
-                handelJoinPKRoom()
-            }, 1000);
-        }
-
-        async function handelJoinPKRoom() {
-            const roomId = pkInfo.inviterUserId === userId ? pkInfo.inviteeRoomId : pkInfo.inviterRoomId
-            const res = await roomPKHandler.joinOtherRoom(roomId)
-            if (res.code !== RCRTCCode.SUCCESS) {
-                console.log("加入失败", code)
-                return
-            }
-
-            const { room: otherRoom, userIds, tracks } = res
-            pkRoomInstance = otherRoom
-            console.log(res);
-            console.log('房间实例: ', otherRoom)
-            console.log('房间内人员: ', userIds)
-            console.log('房间内资源: ', tracks)
-
-
-            setTimeout(() => {
-                tracks.forEach(track => {
-                    playVideo(track, "pkbox")
-                });
-            }, 2000);
-
-
-            // 注册房间事件监听器，重复注册时，仅最后一次注册有效
-            pkRoomInstance.registerRoomEventListener({
-                /**
-                 * 当本端被剔出房间
-                 * @description 被踢出房间可能是由于服务端超出一定时间未能收到 rtcPing 消息，所以认为己方离线。
-                 * 另一种可能是己方 rtcPing 失败次数超出上限，故而主动断线
-                 * @param byServer
-                 * 当值为 false 时，说明本端 rtcPing 超时
-                 * 当值为 true 时，说明本端收到被踢出房间通知
-                 */
-                onKickOff(byServer) {
-                },
-                /**
-                 * 接收到房间信令时回调，用户可通过房间实例的 `sendMessage(name, content)` 接口发送信令
-                 * @param name 信令名
-                 * @param content 信令内容
-                 * @param senderUserId 发送者 Id
-                 * @param messageUId 消息唯一标识
-                 */
-                onMessageReceive(name, content, senderUserId, messageUId) {
-                },
-                /**
-                 * 监听房间属性变更通知
-                 * @param name
-                 * @param content
-                 */
-                onRoomAttributeChange(name, content) {
-                },
-                /**
-                 * 房间用户禁用/启用音频
-                 * @param audioTrack RCRemoteAudioTrack 类实例
-                 */
-                onAudioMuteChange(audioTrack) {
-                },
-                /**
-                 * 房间用户禁用/启用视频
-                 * @param videoTrack RCRemoteVideoTrack 类实例对象
-                 */
-                onVideoMuteChange(videoTrack) {
-                },
-                /**
-                 * 房间内用户发布资源
-                 * @param tracks 新发布的音轨与视轨数据列表，包含新发布的 RCRemoteAudioTrack 与 RCRemoteVideoTrack 实例
-                 */
-                async onTrackPublish(tracks) {
-                    console.log("PK 房间内用户发布资源", tracks)
-                    // 按业务需求选择需要订阅资源，通过 room.subscribe 接口进行订阅
-                    const { code } = await pkRoomInstance.subscribe(tracks)
-                    if (code !== RCRTCCode.SUCCESS) {
-                        console.log('资源订阅失败 ->', code)
-                    }
-                },
-                /**
-                 * 房间用户取消发布资源
-                 * @param tracks 被取消发布的音轨与视轨数据列表
-                 * @description 当资源被取消发布时，SDK 内部会取消对相关资源的订阅，业务层仅需处理 UI 业务
-                 */
-                onTrackUnpublish(tracks) {
-                },
-                /**
-                 * 订阅的音视频流通道已建立, track 已可以进行播放
-                 * @param track RCRemoteTrack 类实例
-                 */
-                onTrackReady(track) {
-                    console.log("PK 订阅的音视频流通道已建立, track 已可以进行播放", track)
-                    playVideo(track, "pkbox")
-                },
-                /**
-                 * 人员加入
-                 * @param userIds 加入的人员 id 列表
-                 */
-                onUserJoin(userIds) {
-                },
-                /**
-                 * 人员退出
-                 * @param userIds
-                 */
-                onUserLeave(userIds) {
-                },
-                /**
-                 * 房间内主播和观众切换身份
-                 * @param userId 用户 ID
-                 * @param role 用户角色
-                 * role 值为 RCRTCLiveRole.ANCHOR 时，代表房间内观众升级为主播
-                 * role 值为 RCRTCLiveRole.AUDIENCE 时，代表主播降级为房间内的观众
-                 */
-                onSwitchRole(userId, role) {
-                }
-            })
-
-        }
-
-
-
-        setTimeout(() => {
-            handelJoinLivingRoom()
-        }, 3000);
     </script>
 </body>
 

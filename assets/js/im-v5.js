@@ -1,4 +1,5 @@
 let { appkey, token, targetId, userId, logLevel, isHaveUser } = Config;
+console.log("logLevel", logLevel)
 
 // console.log(RongIMLib, RCRTC) // 顶级变量
 const { installer: rtcInstaller, RCRTCClient, RCTrack, RCFrameRate, RCResolution, RCLivingType, RCRTCCode } = RCRTC;
@@ -6,7 +7,7 @@ const { installer: rtcInstaller, RCRTCClient, RCTrack, RCFrameRate, RCResolution
 // 初始化 IM
 RongIMLib.init({
     appkey,
-    // logLevel
+    logLevel
 });
 
 /**
