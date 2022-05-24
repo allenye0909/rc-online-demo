@@ -11,6 +11,13 @@
     <script src="https://cdn.ronghub.com/RCCall-5.0.7.prod.js"></script>
     <script src="./utils.js"></script>
     <script src="./config.js"></script>
+    <script src="https://unpkg.com/vconsole/dist/vconsole.min.js"></script>
+    <script>
+        // VConsole will be exported to `window.VConsole` by default.
+        if ((navigator.userAgent.match(/(iPhone|iPod|Android|ios|iOS|iPad|Backerry|WebOS|Symbian|Windows Phone|Phone)/i))) {
+            new window.VConsole();
+        }
+    </script>
     <style>
         video {
             width: 400px;
