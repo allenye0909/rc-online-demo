@@ -5,59 +5,63 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- <script src="https://cdn.ronghub.com/RongIMLib-5.1.0.prod.js"></script> -->
-    <script src="https://cdn.ronghub.com/RongIMLib-5.1.2.prod.js"></script>
-    <script src="https://cdn.ronghub.com/RCRTC-5.4.0.prod.js"></script>
-    <!-- <script src="./dist/RCRTC-5.3.8-alpha.1.prod.js"></script> -->
-    <script src="./config.js"></script>
-    <script src="./assets/js/im-v5.js"></script>
+    <script src="https://cdn.ronghub.com/RongIMLib-5.1.6.prod.js"></script>
+    <!-- <script src="https://cdn.ronghub.com/RCRTC-5.4.0.prod.js"></script> -->
+    <script src="./dist/RCRTC-5.4.0.dev.js"></script>
     <title>Document</title>
 </head>
 
 <body>
-    <pre style="margin-left: -56px">
-
-    </pre>
-
     <button onclick="handelJoinLivingRoom()">加入房间</button>
-    <button onclick="handelGetMediaAndPublishVideoAndAudio(2)">获取、发布音视频</button>
-    <button onclick="handelGetMediaAndPublishAudio(2)">获取、发布音频</button>
-    <button onclick="handelUnpublish(2)">取消发布音视频</button>
-
-    <!-- /**
-    * 媒体资源类型
-    */
-    export enum RCMediaType {
-    /**
-    * 音频流
-    */
-    AUDIO_ONLY = 0,
-    /**
-    * 视频流
-    */
-    VIDEO_ONLY = 1,
-    /**
-    * 音视频混合流，只在 web 端存在混合流的情况
-    */
-    AUDIO_VIDEO = 2
-    } -->
-
-
-
+    <button onclick="handelGetMediaAndPublishVideoAndAudio()">获取、发布音视频</button>
+    <button onclick="handelUnpublish()">取消发布音视频</button>
 
     <div id="box"></div>
-    <div id="pkbox"></div>
+
 
     <script>
-        const rtcClient = RongIMLib.installPlugin(rtcInstaller, { logLevel/*初始化参数请参考下方参数说明*/ })
+        const appkey = "kj7swf8oks5h2";
+        const token = "JIcZGRVYACFnRsqSIi3hm1DKxFEkcMcziWFSKBIw9eg=@af01.cn.rongnav.com;af01.cn.rongcfg.com";
         let roomInstance;
-        let roomPKHandler;
-        let pkRoomInstance;
-        const roomId = location.search.includes("pk") ? "pkRoomId" : "roomId"
-        const inviteeRoomId = roomId === "pkRoomId" ? "roomId" : "pkRoomId"
-        const inviteeUserId = targetId;
-        var pkInfo;
+        // 初始化 IM
+        RongIMLib.init({
+            appkey,
+        });
+        const { installer: rtcInstaller, RCRTCClient, RCTrack, RCFrameRate, RCResolution, RCLivingType, RCRTCCode } = RCRTC;
 
+
+        const rtcClient = RongIMLib.installPlugin(rtcInstaller, { /*初始化参数请参考下方参数说明*/ })
+
+
+        /**
+         * 监听消息通知
+         */
+        const Events = RongIMLib.Events;
+        RongIMLib.addEventListener(Events.MESSAGES, (event) => {
+            console.log('received messages', event.messages);
+        });
+
+        /**
+         * 监听 IM 连接状态变化
+         */
+        RongIMLib.addEventListener(Events.CONNECTING, () => {
+            console.log('onConnecting');
+        });
+        RongIMLib.addEventListener(Events.CONNECTED, () => {
+            console.log('onConnected');
+        });
+        RongIMLib.addEventListener(Events.DISCONNECT, () => {
+            console.log('onDisconnect');
+        });
+
+        console.log("token:", token)
+        RongIMLib.connect(token)
+            .then((user) => {
+                console.log("链接成功, 链接用户 id 为: ", user.data.userId);
+            })
+            .catch((error) => {
+                console.log("链接失败: ", error);
+            });
 
 
         async function handelJoinLivingRoom() {
@@ -72,8 +76,7 @@
             //     AUDIO = 1
             // }
             // joinLivingRoom
-            console.log("joinRTCRoom roomid:", roomId)
-            const { code, room, userIds, tracks: remoteTracks } = await rtcClient.joinRTCRoom(roomId)
+            const { code, room, userIds, tracks: remoteTracks } = await rtcClient.joinRTCRoom("roomId")
             console.log("userIds:", userIds)
             // debugger
             // 若加入失败，则 room、userIds、tracks 值为 undefined
@@ -177,9 +180,6 @@
                     playVideo(track)
                 }
             })
-            // handelGetMediaAndPublishVideoAndAudio()
-            // handelGetMediaAndPublishVideoAndAudio()
-            // handelPKInit()
         }
 
         async function handelGetMediaAndPublishVideoAndAudio() {
@@ -197,65 +197,6 @@
                 handelPublish(tracks)
             }
         }
-
-        async function handelGetMediaAndPublishVideo() {
-            const { code, track } = await rtcClient.createCameraVideoTrack(tag = 'RongCloudRTC-Video')
-
-            console.log(code, track)
-
-            if (code === RCRTCCode.SUCCESS) {
-                playVideo(track);
-                handelPublish(track)
-            }
-        }
-
-        async function handelGetMediaAndPublishAudio() {
-            const { code, track } = await rtcClient.createMicrophoneAudioTrack(tag = 'RongCloudRTC-Audio')
-
-            console.log(code, track)
-            window.tracks = [track]
-
-            if (code === RCRTCCode.SUCCESS) {
-                playVideo(track);
-                handelPublish(track)
-            }
-        }
-
-        async function handelGetMediaAndPublishScreen() {
-
-
-            const { code, track } = await rtcClient.createScreenVideoTrack(tag = 'RongCloudRTC-screen')
-            console.log(code, track)
-            // public static EVENT_LOCAL_TRACK_END = 'local-track-end'
-            window.track = track;
-            track.on("local-track-end", (track) => {
-                // 取消发布屏幕共享流，room 为当前加入的房间实例
-                console.log("监听到了 取消屏幕流")
-                // room.unpublish([track])
-            })
-
-            // setTimeout(() => {
-            //     track.destroy()
-            // }, 5000);
-
-
-            if (code === RCRTCCode.SUCCESS) {
-                playVideo(track);
-                handelPublish(track)
-            }
-        }
-
-        function stopCapture(evt) {
-            // $$('video')[0].srcObject.getTracks().forEach(track => track.stop());
-            // $$('video')[0].srcObject = null
-            let tracks = videoElem.srcObject.getTracks();
-
-            tracks.forEach(track => track.stop());
-            videoElem.srcObject = null;
-        }
-
-
-
 
         async function handelPublish(tracks) {
 
@@ -282,12 +223,9 @@
             console.log(code, "room.unpublish succcess!")
         }
 
+
         function playVideo(track, dom) {
             console.log(track)
-            // track.isLocalTrack() 是否为本地资源
-            // track.isAudioTrack() 是否为音频
-            // track.isVideoTrack() 是否为视频
-            // track.getUserId()    产生该 track 的用户id
 
             // 远程的音频直接播放, 为了减少回音，可不播放本端音频
             if (track.isAudioTrack()) {
@@ -304,11 +242,6 @@
                 box.appendChild(video);
                 track.play(video);
 
-                // ios 15 手动播放视频
-                // video.load();
-                // setTimeout(() => {
-                //     track.play(video);
-                // }, 0);
             }
         }
 
