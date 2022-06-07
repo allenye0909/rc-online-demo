@@ -9,10 +9,18 @@
     <script src="./config.js"></script>
     <!-- 超级群 5.2.0 -->
     <!-- <script src="https://cdn.ronghub.com/RongIMLib-5.2.0.prod.js"></script> -->
-    <script src="https://cdn.ronghub.com/RongIMLib-5.2.4.prod.js"></script>
+    <script src="https://cdn.ronghub.com/RongIMLib-5.3.1.prod.js"></script>
     <!-- <script src="./dist/RongIMLib-5.0.3.js"></script> -->
     <!-- <script src="./assets/js/RongIMLib-5.0.0.prod.js"></script> -->
     <script src="https://cdn.ronghub.com/RongEmoji-2.2.10.js"></script>
+    <script src="https://unpkg.com/vconsole/dist/vconsole.min.js"></script>
+
+    <script>
+        // VConsole will be exported to `window.VConsole` by default.
+        if ((navigator.userAgent.match(/(iPhone|iPod|Android|ios|iOS|iPad|Backerry|WebOS|Symbian|Windows Phone|Phone)/i))) {
+            new window.VConsole();
+        }
+    </script>
 </head>
 
 <body>
