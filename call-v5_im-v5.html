@@ -43,6 +43,7 @@
     <button onclick="handelEnableVideoTrack()">启用视频</button>
     <button onclick="handelDisableAudioTrack()">禁用音频</button>
     <button onclick="handelEnableAudioTrack()">启用音频</button>
+    <button onclick="handelDescendAbility()">降级通话</button>
 
 
 
@@ -167,8 +168,8 @@
                             console.log("call init ->", "收到人员变更", user)
                         },
                         // 收到通话类型变更 (通话降级)
-                        onMediaModify(type) {
-                            console.log("call init ->", "收到通话类型变更 (通话降级)", type)
+                        onMediaModify(sender,type) {
+                            console.log("call init ->", "收到通话类型变更 (通话降级)", sender,type)
                         },
                         /**
                          * 对方静音后触发
@@ -288,8 +289,8 @@
                         console.log("call ->", "收到人员变更", user)
                     },
                     // 收到通话类型变更 (通话降级)
-                    onMediaModify(type) {
-                        console.log("call ->", "收到通话类型变更 (通话降级)", type)
+                    onMediaModify(sender, type) {
+                        console.log("call ->", "收到通话类型变更 (通话降级)", sender, type)
                     },
 
                     /**
@@ -438,6 +439,15 @@
             //     // do something
             //     console.log(code, ">>>>")
             // }
+        }
+
+        async function handelDescendAbility() {
+            const { code } = await _session.descendAbility()
+            if (code === RCCallErrorCode.SUCCESS) {
+                // do something
+            }
+
+            console.log(code, "降级通话 success")
         }
     </script>
 </body>

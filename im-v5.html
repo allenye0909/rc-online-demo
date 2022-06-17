@@ -38,6 +38,9 @@
         <p>群聊消息回执<button onclick="handelSendRRReq()">发送群消息 并 发送群响应回执请求</button></p>
         <button onclick="handelAddWatch()">添加监听</button>
         <button onclick="handelRemoveWatch()">移除监听</button>
+        <button onclick="handelJoinChatRoom()">加入聊天室</button>
+        <button onclick="handelQuitChatRoom()">退出聊天室</button>
+
     </div>
     <script>
         // const appkey = "8brlm7uf8ozt3"
@@ -65,8 +68,8 @@
         /**
          * 手动调用 disconnect 方法或者用户被踢下线 会触发这个事件
          */
-        RongIMLib.addEventListener(Events.DISCONNECT, () => {
-            console.log("连接中断，需要业务层进行重连处理");
+        RongIMLib.addEventListener(Events.DISCONNECT, (e) => {
+            console.log("连接中断，需要业务层进行重连处理", e);
         });
 
         /**
@@ -87,6 +90,18 @@
 
         RongIMLib.addEventListener(Events.CHATROOM, (event) => {
             console.warn("chatroom", event);
+            if (event.rejoinedRoom) {
+                console.log('SDK 内部重连聊天室信息:', event.rejoinedRoom)
+            }
+            if (event.updatedEntries) {
+                console.log('监听到的聊天室 KV 更新:', event.updatedEntries)
+            }
+            if (event.userChange) {
+                console.log('加入退出的用户通知:', event.userChange)
+            }
+            if (event.chatroomDestroyed) {
+                console.log('聊天室销毁:', event.chatroomDestroyed)
+            }
             // 新增用户加入、退出聊天室通知能力，需要客户开通后支持，可提交工单申请开通
             // const o = {
             //     userChange: {
@@ -237,6 +252,57 @@
                 .click()
         }
 
+        const chatRoomId = "chatroom1";
+        function handelJoinChatRoom() {
+            const count = 50;
+
+            RongIMLib.joinChatRoom(chatRoomId, {
+                count: count
+            }).then(res => {
+                // 加入聊天室成功
+                if (res.code === 0) {
+                    console.log("加入聊天室成功", res.code)
+                    setTimeout(() => {
+                        handelSetChatRoomEntry(chatRoomId)
+                    }, 500);
+                } else {
+                    console.log(res.code, res.msg)
+                }
+            }).catch(error => {
+                console.log(error)
+            })
+
+        }
+
+        function handelQuitChatRoom(params) {
+            RongIMLib.quitChatRoom(chatRoomId).then(res => {
+                // 退出聊天室成功
+                if (res.code === 0) {
+                    console.log('退出聊天室 ' + chatRoomId)
+                }
+            })
+        }
+
+
+        function handelSetChatRoomEntry(chatRoomId) {
+            const entry = {
+                key: 'key' + new Date().getTime(),
+                value: "value" + new Date().getTime(),
+                notificationExtra: 'extra',
+                isAutoDelete: true,
+                isSendNotification: false
+            }
+            RongIMLib.setChatRoomEntry(chatRoomId, entry).then(res => {
+                // 设置聊天室单个属性成功
+                if (res.code === 0) {
+                    console.log("设置聊天室单个属性成功", res.code)
+                } else {
+                    console.log(res.code, res.msg)
+                }
+            }).catch(error => {
+                console.log(error)
+            })
+        }
         function sendHQVoiceMessage() {
             const conversation = {
                 conversationType: 3,

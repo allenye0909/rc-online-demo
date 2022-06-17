@@ -67,6 +67,7 @@
 		let { appkey, token, targetId, userId, logLevel, isHaveUser, inviteId, groupId } = Config;
 		let rongCallLib, _message;
 		const conversationType = location.search.includes("conversationType") ? 3 : 1;
+		targetId = location.search.includes("conversationType") ? groupId : targetId
 		console.log("conversationType->", conversationType)
 		const mediaType = Utils.getQueryVariable("type") == 1 ? RongCallLib.VoIPMediaType.MEDIA_AUDIO : RongCallLib.VoIPMediaType.MEDIA_VEDIO
 		isHaveUser && handelConnect();
