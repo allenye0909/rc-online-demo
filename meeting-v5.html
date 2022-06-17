@@ -11,6 +11,14 @@
     <!-- <script src="./dist/RCRTC-5.3.8-alpha.1.prod.js"></script> -->
     <script src="./config.js"></script>
     <script src="./assets/js/im-v5.js"></script>
+    <script src="https://unpkg.com/vconsole/dist/vconsole.min.js"></script>
+
+    <script>
+        // VConsole will be exported to `window.VConsole` by default.
+        if ((navigator.userAgent.match(/(iPhone|iPod|Android|ios|iOS|iPad|Backerry|WebOS|Symbian|Windows Phone|Phone)/i))) {
+            new window.VConsole();
+        }
+    </script>
     <title>Document</title>
 </head>
 
@@ -23,6 +31,7 @@
     <button onclick="handelGetMediaAndPublishVideoAndAudio(2)">获取、发布音视频</button>
     <button onclick="handelGetMediaAndPublishAudio(2)">获取、发布音频</button>
     <button onclick="handelUnpublish(2)">取消发布音视频</button>
+    <button onclick="userAgent()">userAgent</button>
 
     <!-- /**
     * 媒体资源类型
@@ -310,6 +319,10 @@
                 //     track.play(video);
                 // }, 0);
             }
+        }
+
+        function userAgent(params) {
+            alert(navigator.userAgent)
         }
 
     </script>
